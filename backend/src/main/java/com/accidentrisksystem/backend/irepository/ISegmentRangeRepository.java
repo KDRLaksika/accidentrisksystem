@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface ISegmentRangeRepository extends JpaRepository<SegmentRange, Long> {
 
-    Optional<SegmentRange> findByStartKmLessThanEqualAndEndKmGreaterThan(Double marker);
+    Optional<SegmentRange> findByStartKmLessThanEqualAndEndKmGreaterThan(Double startMarker, Double endMarker);
 }
