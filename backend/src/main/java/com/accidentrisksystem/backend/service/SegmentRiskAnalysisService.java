@@ -103,9 +103,9 @@ public class SegmentRiskAnalysisService implements ISegmentRiskAnalysisService {
 
             RiskLevel riskLevel;
 
-            if (count <= 5) {
+            if (count <= 13) {
                 riskLevel = RiskLevel.LOW;
-            } else if (count <= 10) {
+            } else if (count <= 25) {
                 riskLevel = RiskLevel.MEDIUM;
             } else {
                 riskLevel = RiskLevel.HIGH;

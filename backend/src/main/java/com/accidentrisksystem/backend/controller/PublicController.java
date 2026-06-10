@@ -1,12 +1,13 @@
 package com.accidentrisksystem.backend.controller;
 
 import com.accidentrisksystem.backend.common.ApiResponse;
+import com.accidentrisksystem.backend.dto.request.PredictionRequestDto;
 import com.accidentrisksystem.backend.dto.response.MapSegmentRiskResponseDto;
 import com.accidentrisksystem.backend.dto.response.MapSeverityRiskResponseDto;
-import com.accidentrisksystem.backend.iservice.ISegmentRiskAnalysisService;
-import com.accidentrisksystem.backend.iservice.IAccidentSeverityAnalysisService;
-import com.accidentrisksystem.backend.repository.SegmentRiskAnalysisRepository;
+import com.accidentrisksystem.backend.dto.response.PredictionResponseDto;
+import com.accidentrisksystem.backend.iservice.IPredictionService;
 import com.accidentrisksystem.backend.repository.AccidentSeverityAnalysisRepository;
+import com.accidentrisksystem.backend.repository.SegmentRiskAnalysisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class PublicController {
 
     private final SegmentRiskAnalysisRepository segmentRiskAnalysisRepository;
     private final AccidentSeverityAnalysisRepository accidentSeverityAnalysisRepository;
+    private final IPredictionService predictionService;
 
     @GetMapping("/map/segment-risk")
     public ApiResponse<List<MapSegmentRiskResponseDto>> getSegmentRiskMap() {
@@ -52,5 +54,14 @@ public class PublicController {
                 .toList();
 
         return ApiResponse.success("Severity risk map data", result);
+    }
+
+    @PostMapping("/predict")
+    public ApiResponse<PredictionResponseDto> predictRisk(
+            @RequestBody PredictionRequestDto request
+    ) {
+        PredictionResponseDto response = predictionService.predict(request);
+
+        return ApiResponse.success("Prediction completed successfully", response);
     }
 }

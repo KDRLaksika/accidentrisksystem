@@ -120,9 +120,9 @@ public class TimeBasedRiskAnalysisService implements ITimeBasedRiskAnalysisServi
     }
 
     private RiskLevel calculateRiskLevel(int accidentCount) {
-        if (accidentCount <= 5) {
+        if (accidentCount <= 26) {
             return RiskLevel.LOW;
-        } else if (accidentCount <= 10) {
+        } else if (accidentCount <= 39) {
             return RiskLevel.MEDIUM;
         } else {
             return RiskLevel.HIGH;

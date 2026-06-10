@@ -116,9 +116,9 @@ public class AccidentSeverityAnalysisService implements IAccidentSeverityAnalysi
 
             RiskLevel riskLevel;
 
-            if (severeAccidentCount <= 2) {
+            if (severeAccidentCount <= 6) {
                 riskLevel = RiskLevel.LOW;
-            } else if (severeAccidentCount <= 5) {
+            } else if (severeAccidentCount <= 9) {
                 riskLevel = RiskLevel.MEDIUM;
             } else {
                 riskLevel = RiskLevel.HIGH;
