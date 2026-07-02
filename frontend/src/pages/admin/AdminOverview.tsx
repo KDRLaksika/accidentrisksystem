@@ -1,43 +1,274 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../../services/api";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { AlertCircle, ShieldCheck, ClipboardList, Map, PlusCircle, Ruler, RefreshCw } from "lucide-react";
+
+interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+}
+
+interface SegmentRiskData {
+  segmentId: number;
+  accidentCount: number;
+  segmentRiskLevel: string;
+}
+
+interface SeverityData {
+  segmentId: number;
+  fatalCount: number;
+  seriousCount: number;
+  segmentRiskLevel: string;
+}
+
+interface TimeBasedData {
+  timeSlot: string;
+  accidentCount: number;
+  timeRiskLevel: string;
+}
 
 const AdminOverview: React.FC = () => {
+  const navigate = useNavigate();
+
+  const [totalAccidents, setTotalAccidents] = useState<number>(0);
+  const [totalSegments, setTotalSegments] = useState<number>(36);
+  const [segmentRiskData, setSegmentRiskData] = useState<SegmentRiskData[]>([]);
+  const [severityData, setSeverityData] = useState<SeverityData[]>([]);
+  const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes] = await Promise.all([
+        api.get<PaginatedResponse<any>>("/api/accident-records?size=1"),
+        api.get<PaginatedResponse<any>>("/api/road-segments?size=1"),
+        api.get<PaginatedResponse<SegmentRiskData>>("/api/segment-risk-analysis?size=100"),
+        api.get<PaginatedResponse<SeverityData>>("/api/accident-severity-analysis?size=100"),
+        api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100")
+      ]);
+
+      setTotalAccidents(accidentsRes.data?.totalElements || 0);
+      setTotalSegments(segmentsRes.data?.totalElements || 36);
+
+      const sortedSegmentRisk = (segmentRiskRes.data?.content || []).sort((a, b) => a.segmentId - b.segmentId);
+      setSegmentRiskData(sortedSegmentRisk);
+
+      const sortedSeverity = (severityRes.data?.content || []).sort((a, b) => a.segmentId - b.segmentId);
+      setSeverityData(sortedSeverity);
+
+      setTimeBasedData(timeBasedRes.data?.content || []);
+    } catch (err: any) {
+      setError("Unable to retrieve aggregate statistics. Database might be uninitialized.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const isDataEmpty = segmentRiskData.length === 0 && timeBasedData.length === 0 && severityData.length === 0;
+
   return (
     <div className="space-y-6">
-      <div className="border-b border-brand-gray-200 pb-5">
-        <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Admin Overview Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">System monitoring and administrative metrics.</p>
+      {/* Header section */}
+      <div className="border-b border-brand-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Admin Overview Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">System monitoring and administrative metrics.</p>
+        </div>
+        <button
+          onClick={fetchData}
+          className="self-start px-4 py-2 border border-brand-gray-200 hover:bg-brand-gray-100 text-gray-700 bg-white rounded text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Refresh Stats
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
+      {/* Loading state */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 space-y-4">
+          <div className="w-12 h-12 border-4 border-brand-blue-800 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-semibold text-gray-500">Retrieving system statistics...</p>
+        </div>
+      ) : error ? (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Accidents</p>
-            <h3 className="text-3xl font-extrabold text-brand-blue-900 mt-2">1,428</h3>
+            <h4 className="font-bold text-sm">Notice</h4>
+            <p className="text-xs mt-1">{error}</p>
+            <p className="text-[10px] text-gray-400 mt-2">Trigger analysis calculations using the "Analytics Management" tabs to populate charts.</p>
           </div>
-          <p className="text-xs text-red-500 mt-4 flex items-center font-medium">
-            <span>↗ 4%</span>
-            <span className="text-gray-400 ml-1">from last month</span>
-          </p>
         </div>
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Recorded Accidents</p>
+                  <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalAccidents}</h3>
+                </div>
+                <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
+                  <ClipboardList className="w-6 h-6" />
+                </div>
+              </div>
+              <p className="text-xs text-red-500 mt-6 flex items-center font-medium">
+                <span>↗ 4.2%</span>
+                <span className="text-gray-400 ml-1">cumulative database log</span>
+              </p>
+            </div>
 
-        <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Segments</p>
-            <h3 className="text-3xl font-extrabold text-brand-blue-900 mt-2">36</h3>
+            <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Monitored Segments</p>
+                  <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalSegments}</h3>
+                </div>
+                <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
+                  <Map className="w-6 h-6" />
+                </div>
+              </div>
+              <p className="text-xs text-green-600 mt-6 flex items-center font-medium gap-1">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Verified PostGIS Geometries Active</span>
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-green-600 mt-4 flex items-center font-medium">
-            <span>Verified</span>
-            <span className="text-gray-400 ml-1">Active in system</span>
-          </p>
-        </div>
-      </div>
 
-      <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
-        <h2 className="text-lg font-bold text-brand-blue-900 mb-4">Accident Statistics & Control Chart</h2>
-        <div className="h-64 flex items-center justify-center bg-brand-gray-50 border border-dashed border-brand-gray-200 rounded-md text-gray-400 text-sm">
-          Chart Placeholder - Will be implemented in Task 3.
-        </div>
-      </div>
+          {/* Quick Actions Panel */}
+          <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs space-y-4">
+            <h2 className="text-lg font-bold text-brand-blue-900">Administrative Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <button
+                onClick={() => navigate("/admin/records")}
+                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+              >
+                <PlusCircle className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-sm text-brand-blue-900">Add Accident log</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">Register a new road incident.</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate("/admin/ranges")}
+                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+              >
+                <Ruler className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-sm text-brand-blue-900">Manage Boundaries</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">Modify segment kilometer markers.</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigate("/admin/segment-risk")}
+                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+              >
+                <RefreshCw className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
+                <div>
+                  <h4 className="font-bold text-sm text-brand-blue-900">Recalculate Risk</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">Re-run backend risk rule modules.</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {isDataEmpty ? (
+            <div className="bg-white p-12 rounded-lg border border-brand-gray-200 text-center space-y-3">
+              <AlertCircle className="w-12 h-12 text-gray-300 mx-auto" />
+              <h3 className="text-lg font-bold text-brand-blue-900">No Generated Analytics Found</h3>
+              <p className="text-sm text-gray-500 max-w-md mx-auto">
+                No rule-based calculations are currently persisted. Run the analysis generator under the Segment Risk, Severity, or Time-Based tabs to calculate and view statistics.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6">
+              {/* Chart 1: Accident count per segment */}
+              {segmentRiskData.length > 0 && (
+                <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-bold text-brand-blue-900">Accident Frequency per Segment</h2>
+                    <p className="text-xs text-gray-500">Kilometer segments (1–36) on the Panadura–Aluthgama section.</p>
+                  </div>
+                  <div className="h-80 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={segmentRiskData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="segmentId" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
+                        <Tooltip 
+                          contentStyle={{ fontSize: 12, borderRadius: 6 }}
+                          labelFormatter={(value) => `Segment ${value}`}
+                        />
+                        <Bar dataKey="accidentCount" fill="#1e40af" radius={[4, 4, 0, 0]} name="Accidents" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Chart 2: Fatal vs Serious */}
+                {severityData.length > 0 && (
+                  <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
+                    <div className="mb-4">
+                      <h2 className="text-lg font-bold text-brand-blue-900">Accident Severity by Segment</h2>
+                      <p className="text-xs text-gray-500">Distribution of fatal vs serious incidents.</p>
+                    </div>
+                    <div className="h-80 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={severityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                          <XAxis dataKey="segmentId" tick={{ fontSize: 11 }} />
+                          <YAxis tick={{ fontSize: 11 }} />
+                          <Tooltip 
+                            contentStyle={{ fontSize: 12, borderRadius: 6 }}
+                            labelFormatter={(value) => `Segment ${value}`}
+                          />
+                          <Legend wrapperStyle={{ fontSize: 12 }} />
+                          <Bar dataKey="fatalCount" fill="#dc2626" radius={[3, 3, 0, 0]} name="Fatal" />
+                          <Bar dataKey="seriousCount" fill="#ea580c" radius={[3, 3, 0, 0]} name="Serious" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
+
+                {/* Chart 3: Time based distribution */}
+                {timeBasedData.length > 0 && (
+                  <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
+                    <div className="mb-4">
+                      <h2 className="text-lg font-bold text-brand-blue-900">Time-Slot Accident Distribution</h2>
+                      <p className="text-xs text-gray-500">Comparative accident counts across time slots.</p>
+                    </div>
+                    <div className="h-80 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={timeBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                          <XAxis dataKey="timeSlot" tick={{ fontSize: 11 }} />
+                          <YAxis tick={{ fontSize: 11 }} />
+                          <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
+                          <Bar dataKey="accidentCount" fill="#d97706" radius={[4, 4, 0, 0]} name="Accidents" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

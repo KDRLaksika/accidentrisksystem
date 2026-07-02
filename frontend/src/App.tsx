@@ -1,5 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Auth integrations
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 // Layout wrappers
 import PublicLayout from "./components/PublicLayout";
 import AdminLayout from "./components/AdminLayout";
@@ -29,144 +33,162 @@ import AdminProfile from "./pages/admin/AdminProfile";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes with Public Layout */}
-        <Route
-          path="/"
-          element={
-            <PublicLayout>
-              <PublicOverview />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/records"
-          element={
-            <PublicLayout>
-              <PublicAccidentRecords />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/risk-map"
-          element={
-            <PublicLayout>
-              <SegmentRiskMap />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/severity-map"
-          element={
-            <PublicLayout>
-              <SeverityRiskMap />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/segment-risk"
-          element={
-            <PublicLayout>
-              <PublicSegmentRiskAnalysis />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/severity-analysis"
-          element={
-            <PublicLayout>
-              <PublicSeverityAnalysis />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/time-based"
-          element={
-            <PublicLayout>
-              <PublicTimeBasedAnalysis />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/ml-prediction"
-          element={
-            <PublicLayout>
-              <MLPrediction />
-            </PublicLayout>
-          }
-        />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes with Public Layout */}
+          <Route
+            path="/"
+            element={
+              <PublicLayout>
+                <PublicOverview />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/records"
+            element={
+              <PublicLayout>
+                <PublicAccidentRecords />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/risk-map"
+            element={
+              <PublicLayout>
+                <SegmentRiskMap />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/severity-map"
+            element={
+              <PublicLayout>
+                <SeverityRiskMap />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/segment-risk"
+            element={
+              <PublicLayout>
+                <PublicSegmentRiskAnalysis />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/severity-analysis"
+            element={
+              <PublicLayout>
+                <PublicSeverityAnalysis />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/time-based"
+            element={
+              <PublicLayout>
+                <PublicTimeBasedAnalysis />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/ml-prediction"
+            element={
+              <PublicLayout>
+                <MLPrediction />
+              </PublicLayout>
+            }
+          />
 
-        {/* Login View */}
-        <Route path="/login" element={<Login />} />
+          {/* Login View */}
+          <Route path="/login" element={<Login />} />
 
-        {/* Admin Routes with Admin Layout */}
-        <Route
-          path="/admin"
-          element={
-            <AdminLayout>
-              <AdminOverview />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/records"
-          element={
-            <AdminLayout>
-              <AdminAccidentRecords />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/segments"
-          element={
-            <AdminLayout>
-              <AdminRoadSegments />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/ranges"
-          element={
-            <AdminLayout>
-              <AdminSegmentRanges />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/segment-risk"
-          element={
-            <AdminLayout>
-              <AdminSegmentRiskAnalysis />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/severity"
-          element={
-            <AdminLayout>
-              <AdminSeverityAnalysis />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/time-based"
-          element={
-            <AdminLayout>
-              <AdminTimeBasedAnalysis />
-            </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/profile"
-          element={
-            <AdminLayout>
-              <AdminProfile />
-            </AdminLayout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+          {/* Admin Routes with Admin Layout (Protected) */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminOverview />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/records"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminAccidentRecords />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/segments"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminRoadSegments />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/ranges"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminSegmentRanges />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/segment-risk"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminSegmentRiskAnalysis />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/severity"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminSeverityAnalysis />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/time-based"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminTimeBasedAnalysis />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminProfile />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
