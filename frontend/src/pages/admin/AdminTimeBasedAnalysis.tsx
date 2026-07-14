@@ -47,6 +47,10 @@ const AdminTimeBasedAnalysis: React.FC = () => {
   };
 
   const handleGenerate = async () => {
+    if (items.length > 0) {
+      setError("You have already generated Time Based Analysis");
+      return;
+    }
     setGenerating(true);
     setError(null);
     setSuccessMessage(null);
@@ -94,12 +98,12 @@ const AdminTimeBasedAnalysis: React.FC = () => {
   const getRiskBadgeStyles = (level: string) => {
     switch (level?.toUpperCase()) {
       case "HIGH":
-        return "bg-red-50 text-red-700 border-red-200";
+        return "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/50";
       case "MEDIUM":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+        return "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50";
       case "LOW":
       default:
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/50";
     }
   };
 
@@ -122,7 +126,7 @@ const AdminTimeBasedAnalysis: React.FC = () => {
       <div className="border-b border-brand-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Time-Based Analysis</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-700 font-semibold mt-1">
             Rule-based temporal accident risk classifications (Admin Management).
           </p>
         </div>
@@ -171,17 +175,6 @@ const AdminTimeBasedAnalysis: React.FC = () => {
         </div>
       )}
 
-      {/* Info Card */}
-      <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-4 flex gap-3 text-xs text-brand-blue-900 leading-relaxed">
-        <HelpCircle className="w-5 h-5 text-brand-blue-800 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="font-bold mb-1">Administrative Note</h4>
-          <p>
-            Generating Time-Based Risk calculations runs the backend rule engine that aggregates total accidents in specific temporal slots 
-            (Morning: 06:00-12:00, Daytime: 12:00-18:00, Night: 18:00-06:00) and calculates risk thresholds.
-          </p>
-        </div>
-      </div>
 
       {/* Main Table */}
       <div className="bg-white rounded-lg border border-brand-gray-200 shadow-xs overflow-hidden">
@@ -238,7 +231,7 @@ const AdminTimeBasedAnalysis: React.FC = () => {
                       {item.accidentCount}
                     </td>
                     <td className="px-6 py-3.5">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${getRiskBadgeStyles(item.timeRiskLevel)}`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-xs tracking-wider ${getRiskBadgeStyles(item.timeRiskLevel)}`}>
                         {item.timeRiskLevel}
                       </span>
                     </td>

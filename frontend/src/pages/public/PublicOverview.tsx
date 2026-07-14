@@ -27,6 +27,40 @@ interface TimeBasedData {
   timeRiskLevel: string;
 }
 
+const getRegionName = (segmentId: number) => {
+  if (segmentId >= 1 && segmentId <= 4) return "Panadura";
+  if (segmentId === 18) return "Kalutara";
+  if (segmentId >= 34 && segmentId <= 36) return "Aluthgama";
+  return null;
+};
+
+const CustomizedAxisTick = (props: any) => {
+  const { x, y, payload } = props;
+  const val = Number(payload.value);
+
+  let areaLabel = "";
+  if (val === 2) {
+    areaLabel = "Panadura";
+  } else if (val === 18) {
+    areaLabel = "Kalutara";
+  } else if (val === 34) {
+    areaLabel = "Aluthgama";
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={12} textAnchor="middle" className="fill-gray-600 dark:fill-white" fontSize={10} fontWeight="600">
+        {payload.value}
+      </text>
+      {areaLabel && (
+        <text x={0} y={0} dy={28} textAnchor="middle" className="fill-brand-blue-900 dark:fill-white" fontSize={12} fontWeight="900">
+          {areaLabel}
+        </text>
+      )}
+    </g>
+  );
+};
+
 const PublicOverview: React.FC = () => {
   const [totalAccidents, setTotalAccidents] = useState<number>(0);
   const [totalSegments, setTotalSegments] = useState<number>(36);
@@ -52,7 +86,7 @@ const PublicOverview: React.FC = () => {
 
       setTotalAccidents(accidentsRes.data?.totalElements || 0);
       setTotalSegments(segmentsRes.data?.totalElements || 36);
-      
+
       // Sort segment risk data by segmentId ascending
       const sortedSegmentRisk = (segmentRiskRes.data?.content || []).sort((a, b) => a.segmentId - b.segmentId);
       setSegmentRiskData(sortedSegmentRisk);
@@ -80,7 +114,7 @@ const PublicOverview: React.FC = () => {
       {/* Header section */}
       <div className="border-b border-brand-gray-200 pb-5">
         <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Regional Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Real-time predictive analytics for the A2 Highway Corridor.</p>
+        <p className="text-sm text-gray-700 font-semibold mt-1">Real-time predictive analytics for the A2 Highway Corridor.</p>
       </div>
 
       {/* Loading state */}
@@ -105,7 +139,7 @@ const PublicOverview: React.FC = () => {
             <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Recorded Accidents</p>
+                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Recorded Accidents</p>
                   <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalAccidents}</h3>
                 </div>
                 <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
@@ -121,7 +155,7 @@ const PublicOverview: React.FC = () => {
             <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Monitored Segments</p>
+                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Monitored Segments</p>
                   <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalSegments}</h3>
                 </div>
                 <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
@@ -150,17 +184,20 @@ const PublicOverview: React.FC = () => {
                 <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
                   <div className="mb-4">
                     <h2 className="text-lg font-bold text-brand-blue-900">Accident Frequency per Segment</h2>
-                    <p className="text-xs text-gray-500">Kilometer segments (1–36) on the Panadura–Aluthgama section.</p>
+                    <p className="text-xs text-gray-700 font-semibold">Kilometer segments (1–36) on the Panadura–Aluthgama section.</p>
                   </div>
                   <div className="h-80 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={segmentRiskData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="segmentId" tick={{ fontSize: 11 }} />
-                        <YAxis tick={{ fontSize: 11 }} />
-                        <Tooltip 
+                        <XAxis dataKey="segmentId" tick={<CustomizedAxisTick />} height={55} />
+                        <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
+                        <Tooltip
                           contentStyle={{ fontSize: 12, borderRadius: 6 }}
-                          labelFormatter={(value) => `Segment ${value}`}
+                          labelFormatter={(value) => {
+                            const region = getRegionName(Number(value));
+                            return region ? `Segment ${value} (${region})` : `Segment ${value}`;
+                          }}
                         />
                         <Bar dataKey="accidentCount" fill="#1e40af" radius={[4, 4, 0, 0]} name="Accidents" />
                       </BarChart>
@@ -175,21 +212,24 @@ const PublicOverview: React.FC = () => {
                   <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
                     <div className="mb-4">
                       <h2 className="text-lg font-bold text-brand-blue-900">Accident Severity by Segment</h2>
-                      <p className="text-xs text-gray-500">Distribution of fatal vs serious incidents.</p>
+                      <p className="text-xs text-gray-700 font-semibold">Distribution of fatal vs serious incidents.</p>
                     </div>
                     <div className="h-80 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={severityData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="segmentId" tick={{ fontSize: 11 }} />
-                          <YAxis tick={{ fontSize: 11 }} />
-                          <Tooltip 
+                          <XAxis dataKey="segmentId" tick={<CustomizedAxisTick />} height={55} />
+                          <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
+                          <Tooltip
                             contentStyle={{ fontSize: 12, borderRadius: 6 }}
-                            labelFormatter={(value) => `Segment ${value}`}
+                            labelFormatter={(value) => {
+                              const region = getRegionName(Number(value));
+                              return region ? `Segment ${value} (${region})` : `Segment ${value}`;
+                            }}
                           />
                           <Legend wrapperStyle={{ fontSize: 12 }} />
                           <Bar dataKey="fatalCount" fill="#dc2626" radius={[3, 3, 0, 0]} name="Fatal" />
-                          <Bar dataKey="seriousCount" fill="#ea580c" radius={[3, 3, 0, 0]} name="Serious" />
+                          <Bar dataKey="seriousCount" fill="#2563eb" radius={[3, 3, 0, 0]} name="Serious" />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -201,14 +241,14 @@ const PublicOverview: React.FC = () => {
                   <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
                     <div className="mb-4">
                       <h2 className="text-lg font-bold text-brand-blue-900">Time-Slot Accident Distribution</h2>
-                      <p className="text-xs text-gray-500">Comparative accident counts across time slots.</p>
+                      <p className="text-xs text-gray-700 font-semibold">Comparative accident counts across time slots.</p>
                     </div>
                     <div className="h-80 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={timeBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="timeSlot" tick={{ fontSize: 11 }} />
-                          <YAxis tick={{ fontSize: 11 }} />
+                          <XAxis dataKey="timeSlot" tick={{ fontSize: 9, fontWeight: "bold", fill: "currentColor" }} className="text-gray-700 dark:text-white" />
+                          <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
                           <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
                           <Bar dataKey="accidentCount" fill="#d97706" radius={[4, 4, 0, 0]} name="Accidents" />
                         </BarChart>

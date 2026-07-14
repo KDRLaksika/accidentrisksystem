@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../../services/api";
-import { AlertCircle, BrainCircuit, RefreshCw, CheckCircle, ShieldAlert, Info } from "lucide-react";
+import { AlertCircle, BrainCircuit, RefreshCw, CheckCircle, ShieldAlert } from "lucide-react";
 
 interface PredictionRequest {
   segmentId: number;
@@ -79,7 +79,7 @@ const MLPrediction: React.FC = () => {
           <BrainCircuit className="w-8 h-8 text-brand-blue-800 shrink-0" />
           Accident Risk Prediction
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-700 font-semibold mt-1">
           Live machine learning accident risk predictions powered by a Random Forest Classifier trained on historical corridor logs.
         </p>
       </div>
@@ -166,17 +166,6 @@ const MLPrediction: React.FC = () => {
 
         {/* Prediction Output Panel */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Info Details */}
-          <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-5 flex gap-3 text-xs text-brand-blue-900 leading-relaxed">
-            <Info className="w-5 h-5 text-brand-blue-800 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <h4 className="font-bold">Model Telemetry & Details</h4>
-              <p>
-                The predictor calls the FastAPI microservice running a Python Scikit-Learn Random Forest Classifier. The model calculates the collision risk level based on the selected segment location features and temporal time-windows.
-              </p>
-            </div>
-          </div>
-
           {/* Result Output Card */}
           <div className="bg-white rounded-lg border border-brand-gray-200 shadow-xs p-6 min-h-[260px] flex flex-col justify-center items-center text-center relative overflow-hidden">
             {loading ? (

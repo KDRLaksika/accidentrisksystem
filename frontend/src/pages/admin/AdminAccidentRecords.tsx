@@ -102,10 +102,12 @@ const AdminAccidentRecords: React.FC = () => {
 
   // Client side search and filter
   const filteredRecords = allRecords.filter((rec) => {
+    const term = searchTerm.trim().toLowerCase();
     const matchesSearch =
       searchTerm === "" ||
-      rec.segmentId.toString().includes(searchTerm) ||
-      rec.nearestKmMarker.toString().includes(searchTerm);
+      rec.segmentId.toString() === term ||
+      `segment ${rec.segmentId}`.toLowerCase() === term ||
+      `segment${rec.segmentId}`.toLowerCase() === term;
       
     const matchesSeverity =
       severityFilter === "ALL" || rec.severityLevel.toUpperCase() === severityFilter.toUpperCase();
@@ -237,7 +239,7 @@ const AdminAccidentRecords: React.FC = () => {
       <div className="border-b border-brand-gray-200 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Manage Accidents</h1>
-          <p className="text-sm text-gray-500 mt-1">Administrative portal to insert, update, and delete road accident records.</p>
+          <p className="text-sm text-gray-700 font-semibold mt-1">Administrative portal to insert, update, and delete road accident records.</p>
         </div>
         <button
           onClick={openCreateModal}
@@ -260,7 +262,7 @@ const AdminAccidentRecords: React.FC = () => {
               </span>
               <input
                 type="text"
-                placeholder="Search by Segment ID or KM marker..."
+                placeholder="Search by Segment ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-3 py-1.5 border border-brand-gray-200 rounded bg-white text-xs focus:outline-none focus:border-brand-blue-800"
@@ -331,12 +333,12 @@ const AdminAccidentRecords: React.FC = () => {
                     <td className="py-3 px-6 text-gray-600">{item.nearestKmMarker} km</td>
                     <td className="py-3 px-6">
                       <span
-                        className={`inline-flex px-2 py-0.5 rounded-full font-bold uppercase text-[9px] ${
+                        className={`inline-flex px-2.5 py-0.5 rounded-full font-extrabold uppercase text-[10px] tracking-wider border shadow-xs ${
                           item.severityLevel.toUpperCase() === "FATAL"
-                            ? "bg-red-100 text-red-700 border border-red-200"
+                            ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/50"
                             : item.severityLevel.toUpperCase() === "SERIOUS"
-                            ? "bg-amber-100 text-amber-700 border border-amber-200"
-                            : "bg-blue-100 text-brand-blue-800 border border-brand-blue-200"
+                            ? "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50"
+                            : "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/50"
                         }`}
                       >
                         {item.severityLevel}

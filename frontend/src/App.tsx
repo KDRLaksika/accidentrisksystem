@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Auth integrations
@@ -32,6 +33,16 @@ import AdminTimeBasedAnalysis from "./pages/admin/AdminTimeBasedAnalysis";
 import AdminProfile from "./pages/admin/AdminProfile";
 
 function App() {
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

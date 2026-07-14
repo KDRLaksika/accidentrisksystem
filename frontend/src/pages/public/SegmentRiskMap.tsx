@@ -58,7 +58,7 @@ const SegmentRiskMap: React.FC = () => {
       <div className="border-b border-brand-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Segment Risk Map</h1>
-          <p className="text-sm text-gray-500 mt-1">Interactive GIS map showing accident risk level classification per kilometer segment.</p>
+          <p className="text-sm text-gray-700 font-semibold mt-1">Interactive GIS map showing accident risk level classification per kilometer segment.</p>
         </div>
         <button
           onClick={fetchMapData}

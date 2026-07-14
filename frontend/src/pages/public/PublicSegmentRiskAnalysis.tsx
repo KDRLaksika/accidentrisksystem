@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../../services/api";
-import { Search, AlertCircle, ArrowUpDown, HelpCircle } from "lucide-react";
+import { Search, AlertCircle, ArrowUpDown } from "lucide-react";
 
 interface SegmentRiskAnalysisItem {
   resultId: number;
@@ -81,18 +81,24 @@ const PublicSegmentRiskAnalysis: React.FC = () => {
   const getRiskBadgeStyles = (level: string) => {
     switch (level?.toUpperCase()) {
       case "HIGH":
-        return "bg-red-50 text-red-700 border-red-200";
+        return "bg-red-100 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/50";
       case "MEDIUM":
-        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+        return "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/50";
       case "LOW":
       default:
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/50";
     }
   };
 
   // 1. Filter items
   const filteredItems = items.filter((item) => {
-    const matchesSegment = item.segmentId.toString().includes(searchSegment.trim());
+    const term = searchSegment.trim().toLowerCase();
+    const matchesSegment =
+      searchSegment.trim() === "" ||
+      item.segmentId.toString() === term ||
+      `segment ${item.segmentId}`.toLowerCase() === term ||
+      `segment${item.segmentId}`.toLowerCase() === term;
+
     const matchesRisk = riskFilter === "ALL" || item.segmentRiskLevel?.toUpperCase() === riskFilter;
     return matchesSegment && matchesRisk;
   });
@@ -130,22 +136,9 @@ const PublicSegmentRiskAnalysis: React.FC = () => {
       {/* Header */}
       <div className="border-b border-brand-gray-200 pb-5">
         <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Segment Risk Analysis</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-700 font-semibold mt-1">
           Rule-based aggregate accident count analysis per road segment (Read-Only).
         </p>
-      </div>
-
-      {/* Info Card */}
-      <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-4 flex gap-3 text-xs text-brand-blue-900 leading-relaxed">
-        <HelpCircle className="w-5 h-5 text-brand-blue-800 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="font-bold mb-1">About Segment Risk Classification</h4>
-          <p>
-            Segment Risk level calculations are calculated by aggregating the total accident count per kilometer road segment. 
-            Segments are classified as: <strong>High Risk</strong> (accident count &gt;= 20), <strong>Medium Risk</strong> (accident count between 10 and 19), 
-            and <strong>Low Risk</strong> (accident count &lt; 10).
-          </p>
-        </div>
       </div>
 
       {/* Main content table */}
@@ -240,7 +233,7 @@ const PublicSegmentRiskAnalysis: React.FC = () => {
                       {item.accidentCount}
                     </td>
                     <td className="px-6 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${getRiskBadgeStyles(item.segmentRiskLevel)}`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-xs tracking-wider ${getRiskBadgeStyles(item.segmentRiskLevel)}`}>
                         {item.segmentRiskLevel}
                       </span>
                     </td>

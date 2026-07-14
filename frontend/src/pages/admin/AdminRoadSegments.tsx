@@ -53,7 +53,13 @@ const AdminRoadSegments: React.FC = () => {
   }, [searchTerm]);
 
   const filteredSegments = segments.filter((seg) => {
-    return searchTerm === "" || seg.segmentId.toString().includes(searchTerm);
+    const term = searchTerm.trim().toLowerCase();
+    return (
+      searchTerm === "" ||
+      seg.segmentId.toString() === term ||
+      `segment ${seg.segmentId}`.toLowerCase() === term ||
+      `segment${seg.segmentId}`.toLowerCase() === term
+    );
   });
 
   const totalPages = Math.ceil(filteredSegments.length / pageSize);
@@ -80,7 +86,7 @@ const AdminRoadSegments: React.FC = () => {
     <div className="space-y-6">
       <div className="border-b border-brand-gray-200 pb-5">
         <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Road Segments</h1>
-        <p className="text-sm text-gray-500 mt-1">Detailed list of 36 geographical road segments loaded from PostGIS (Read-Only).</p>
+        <p className="text-sm text-gray-700 font-semibold mt-1">Detailed list of 36 geographical road segments loaded from PostGIS (Read-Only).</p>
       </div>
 
       <div className="bg-white rounded-lg border border-brand-gray-200 shadow-xs overflow-hidden">

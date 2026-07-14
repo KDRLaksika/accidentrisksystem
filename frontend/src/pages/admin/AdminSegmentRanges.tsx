@@ -93,7 +93,13 @@ const AdminSegmentRanges: React.FC = () => {
   }, [searchTerm]);
 
   const filteredRanges = ranges.filter((item) => {
-    return searchTerm === "" || item.segmentId.toString().includes(searchTerm);
+    const term = searchTerm.trim().toLowerCase();
+    return (
+      searchTerm === "" ||
+      item.segmentId.toString() === term ||
+      `segment ${item.segmentId}`.toLowerCase() === term ||
+      `segment${item.segmentId}`.toLowerCase() === term
+    );
   });
 
   const totalPages = Math.ceil(filteredRanges.length / pageSize);
@@ -217,7 +223,7 @@ const AdminSegmentRanges: React.FC = () => {
       <div className="border-b border-brand-gray-200 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Segment Ranges</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage physical boundaries and kilometer ranges for the A2 Highway corridor segments.</p>
+          <p className="text-sm text-gray-700 font-semibold mt-1">Manage physical boundaries and kilometer ranges for the A2 Highway corridor segments.</p>
         </div>
         <button
           onClick={openCreateModal}

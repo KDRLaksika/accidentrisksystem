@@ -1,21 +1,119 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "leaflet/dist/leaflet.css";
 
+:root {
+  --brand-blue-50: #eff6ff;
+  --brand-blue-100: #dbeafe;
+  --brand-blue-600: #2563eb;
+  /* Premium high-contrast blue */
+  --brand-blue-800: #1d4ed8;
+  /* Strong brand blue for main actions */
+  --brand-blue-900: #1e3a8a;
+  /* Deep corporate blue for typography */
+  --brand-dark: #0f172a;
+  /* Body text color */
+  --brand-bg-page: #f8fafc;
+  /* Clean off-white page background */
+  --brand-gray-50: #f1f5f9;
+  /* Slate-100 for table/card subheadings */
+  --brand-gray-100: #f8fafc;
+  /* Slate-50 for hover selections */
+  --brand-gray-200: #e2e8f0;
+  /* Slate-200 for clean borders */
+
+  --card-bg: #ffffff;
+  /* Card background */
+  --text-brand-dark: #0f172a;
+  /* Custom text color variable */
+
+  /* Grays for Light Mode */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+
+.dark {
+  --brand-blue-50: #172554;
+  /* Dark navy background text */
+  --brand-blue-100: #1e3a8a;
+  /* Deep blue border accents */
+  --brand-blue-600: #3b82f6;
+  /* Bright active blue */
+  --brand-blue-800: #60a5fa;
+  /* Light blue details */
+  --brand-blue-900: #93c5fd;
+  /* Soft light blue headings */
+  --brand-dark: #f8fafc;
+  /* Light body text */
+  --brand-bg-page: #0b0f19;
+  /* Slate-950 page background */
+  --brand-gray-50: #1e293b;
+  /* Slate-800 card subheaders */
+  --brand-gray-100: #0f172a;
+  /* Slate-900 hovers */
+  --brand-gray-200: #334155;
+  /* Slate-700 dark borders */
+
+  --card-bg: #1e293b;
+  /* Slate-800 card backgrounds */
+  --text-brand-dark: #f1f5f9;
+
+  /* Inverted Grays for Dark Mode (optimizing text readability and label contrast) */
+  --gray-50: #0b0f19;
+  --gray-100: #0f172a;
+  --gray-200: #1e293b;
+  --gray-300: #334155;
+  --gray-400: #cbd5e1;
+  /* Slate-300: crisp gray for description copy */
+  --gray-500: #e2e8f0;
+  /* Slate-200 */
+  --gray-600: #f1f5f9;
+  /* Slate-100: highly visible labels */
+  --gray-700: #f8fafc;
+  /* Slate-50 */
+  --gray-800: #ffffff;
+  --gray-900: #ffffff;
+}
+
 @theme {
-  --color-brand-blue-50: #eff6ff;
-  --color-brand-blue-100: #dbeafe;
-  --color-brand-blue-600: #1d4ed8;
-  --color-brand-blue-800: #1e40af;
-  --color-brand-blue-900: #1e3a8a;
-  --color-brand-dark: #0f172a;
-  --color-brand-gray-50: #f9fafb;
-  --color-brand-gray-100: #f3f4f6;
-  --color-brand-gray-200: #e5e7eb;
+  --color-brand-blue-50: var(--brand-blue-50);
+  --color-brand-blue-100: var(--brand-blue-100);
+  --color-brand-blue-600: var(--brand-blue-600);
+  --color-brand-blue-800: var(--brand-blue-800);
+  --color-brand-blue-900: var(--brand-blue-900);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-bg-page: var(--brand-bg-page);
+  --color-brand-gray-50: var(--brand-gray-50);
+  --color-brand-gray-100: var(--brand-gray-100);
+  --color-brand-gray-200: var(--brand-gray-200);
+  --color-brand-text: var(--text-brand-dark);
+
+  --color-white: var(--card-bg);
+
+  /* Overriding default tailwind gray colors for automatic text dark-mode conversion */
+  --color-gray-50: var(--gray-50);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-gray-800: var(--gray-800);
+  --color-gray-900: var(--gray-900);
 }
 
 @layer base {
   body {
-    @apply bg-brand-gray-50 text-brand-dark font-sans antialiased;
+    @apply bg-brand-bg-page text-brand-dark font-sans antialiased;
     margin: 0;
     padding: 0;
   }
@@ -26,13 +124,16 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
@@ -42,4 +143,41 @@
   width: 100%;
   height: 100%;
   z-index: 10;
+}
+
+/* Invert map tiles to create a gorgeous high-end dark map style */
+.dark .leaflet-tile {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Recharts adaptive chart text styling for Dark Mode */
+.dark svg text,
+.dark .recharts-cartesian-axis-tick text,
+.dark .recharts-legend-item-text,
+.dark .recharts-label {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.dark .recharts-default-tooltip {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
+}
+
+.dark .recharts-default-tooltip * {
+  color: #ffffff !important;
+}
+
+.dark .recharts-cartesian-grid line {
+  stroke: #334155 !important;
 }
