@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../../services/api";
-import { AlertCircle, ArrowUpDown, RefreshCw, CheckCircle } from "lucide-react";
+import { AlertCircle, ArrowUpDown } from "lucide-react";
 
-interface TimeBasedAnalysisItem {
+interface MonthBasedAnalysisItem {
   resultId: number;
-  timeSlot: string;
+  month: string;
   accidentCount: number;
-  timeRiskLevel: string;
+  monthRiskLevel: string;
 }
 
 interface PageResponse<T> {
@@ -18,26 +18,39 @@ interface PageResponse<T> {
   last: boolean;
 }
 
-const AdminTimeBasedAnalysis: React.FC = () => {
-  const [items, setItems] = useState<TimeBasedAnalysisItem[]>([]);
+const MONTH_ORDER: { [key: string]: number } = {
+  "January": 1,
+  "February": 2,
+  "March": 3,
+  "April": 4,
+  "May": 5,
+  "June": 6,
+  "July": 7,
+  "August": 8,
+  "September": 9,
+  "October": 10,
+  "November": 11,
+  "December": 12
+};
+
+const PublicMonthBasedAnalysis: React.FC = () => {
+  const [items, setItems] = useState<MonthBasedAnalysisItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Sorting state
-  const [sortField, setSortField] = useState<"timeSlot" | "accidentCount" | "timeRiskLevel">("timeSlot");
+  const [sortField, setSortField] = useState<"month" | "accidentCount" | "monthRiskLevel">("month");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const fetchAnalysisData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<PageResponse<TimeBasedAnalysisItem>>("/api/time-based-risk-analysis?size=100");
+      const response = await api.get<PageResponse<MonthBasedAnalysisItem>>("/api/month-based-risk-analysis?size=100");
       if (response.success && response.data) {
         setItems(response.data.content || []);
       } else {
-        setError(response.message || "Failed to load time-based risk analysis.");
+        setError(response.message || "Failed to load month-based risk analysis.");
       }
     } catch (err: any) {
       setError(err.message || "An error occurred while loading analysis data.");
@@ -46,35 +59,11 @@ const AdminTimeBasedAnalysis: React.FC = () => {
     }
   };
 
-  const handleGenerate = async () => {
-    if (items.length > 0) {
-      setError("You have already generated Time Based Analysis");
-      return;
-    }
-    setGenerating(true);
-    setError(null);
-    setSuccessMessage(null);
-    try {
-      const response = await api.post<void>("/api/time-based-risk-analysis/generate", {});
-      if (response.success) {
-        setSuccessMessage("Time-based risk calculations generated and saved successfully!");
-        await fetchAnalysisData();
-        setTimeout(() => setSuccessMessage(null), 5000);
-      } else {
-        setError(response.message || "Failed to generate time-based calculations.");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred during time-based calculations generation.");
-    } finally {
-      setGenerating(false);
-    }
-  };
-
   useEffect(() => {
     fetchAnalysisData();
   }, []);
 
-  const handleSort = (field: "timeSlot" | "accidentCount" | "timeRiskLevel") => {
+  const handleSort = (field: "month" | "accidentCount" | "monthRiskLevel") => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -110,12 +99,14 @@ const AdminTimeBasedAnalysis: React.FC = () => {
   // Sort items
   const sortedItems = [...items].sort((a, b) => {
     let multiplier = sortDirection === "asc" ? 1 : -1;
-    if (sortField === "timeSlot") {
-      return a.timeSlot.localeCompare(b.timeSlot) * multiplier;
+    if (sortField === "month") {
+      const orderA = MONTH_ORDER[a.month] || 0;
+      const orderB = MONTH_ORDER[b.month] || 0;
+      return (orderA - orderB) * multiplier;
     } else if (sortField === "accidentCount") {
       return (a.accidentCount - b.accidentCount) * multiplier;
-    } else if (sortField === "timeRiskLevel") {
-      return (getRiskWeight(a.timeRiskLevel) - getRiskWeight(b.timeRiskLevel)) * multiplier;
+    } else if (sortField === "monthRiskLevel") {
+      return (getRiskWeight(a.monthRiskLevel) - getRiskWeight(b.monthRiskLevel)) * multiplier;
     }
     return 0;
   });
@@ -123,69 +114,33 @@ const AdminTimeBasedAnalysis: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-brand-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Time-Based Analysis</h1>
-          <p className="text-sm text-gray-700 font-semibold mt-1">
-            Rule-based temporal accident risk classifications (Admin Management).
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={fetchAnalysisData}
-            disabled={loading || generating}
-            className="px-4 py-2 border border-brand-gray-200 hover:bg-brand-gray-100 text-gray-700 bg-white rounded text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </button>
-          <button
-            onClick={handleGenerate}
-            disabled={loading || generating}
-            className="bg-brand-blue-800 text-white px-4 py-2 rounded text-xs font-semibold hover:bg-brand-blue-900 shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-          >
-            {generating ? (
-              <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                Calculating...
-              </>
-            ) : (
-              "Generate Analysis"
-            )}
-          </button>
-        </div>
+      <div className="border-b border-brand-gray-200 pb-5">
+        <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Month-Based Analysis</h1>
+        <p className="text-sm text-gray-700 font-semibold mt-1">
+          Rule-based monthly accident risk classifications (Read-Only).
+        </p>
       </div>
-
-      {/* Toast Success */}
-      {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md flex items-center gap-2 text-xs font-medium animate-fadeIn">
-          <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
-          <span>{successMessage}</span>
-        </div>
-      )}
-
-      {/* Toast Error */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md flex items-start gap-2 text-xs leading-normal">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-bold">Execution Error</h4>
-            <p className="mt-1">{error}</p>
-          </div>
-        </div>
-      )}
-
 
       {/* Main Table */}
       <div className="bg-white rounded-lg border border-brand-gray-200 shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-12 flex flex-col items-center justify-center space-y-4">
             <div className="w-10 h-10 border-4 border-brand-blue-800 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-xs font-semibold text-gray-500">Loading temporal analysis...</p>
+            <p className="text-xs font-semibold text-gray-500">Loading monthly analysis...</p>
+          </div>
+        ) : error ? (
+          <div className="p-8 flex items-center justify-center">
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md flex items-start gap-2 text-xs leading-normal max-w-md">
+              <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold">Fetch Error</h4>
+                <p className="mt-1">{error}</p>
+              </div>
+            </div>
           </div>
         ) : sortedItems.length === 0 ? (
           <div className="p-12 text-center text-gray-500 text-xs">
-            No analysis results generated yet. Please click "Generate Analysis" to run calculations.
+            No monthly risk analysis results generated yet.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -193,11 +148,11 @@ const AdminTimeBasedAnalysis: React.FC = () => {
               <thead className="bg-brand-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
                 <tr>
                   <th
-                    onClick={() => handleSort("timeSlot")}
+                    onClick={() => handleSort("month")}
                     className="px-6 py-3.5 text-left cursor-pointer hover:bg-brand-gray-100 select-none transition-colors"
                   >
                     <div className="flex items-center gap-1">
-                      Time Slot
+                      Month
                       <ArrowUpDown className="w-3 h-3" />
                     </div>
                   </th>
@@ -211,11 +166,11 @@ const AdminTimeBasedAnalysis: React.FC = () => {
                     </div>
                   </th>
                   <th
-                    onClick={() => handleSort("timeRiskLevel")}
+                    onClick={() => handleSort("monthRiskLevel")}
                     className="px-6 py-3.5 text-left cursor-pointer hover:bg-brand-gray-100 select-none transition-colors"
                   >
                     <div className="flex items-center gap-1">
-                      Temporal Risk Level
+                      Month Risk Level
                       <ArrowUpDown className="w-3 h-3" />
                     </div>
                   </th>
@@ -225,14 +180,14 @@ const AdminTimeBasedAnalysis: React.FC = () => {
                 {sortedItems.map((item) => (
                   <tr key={item.resultId} className="hover:bg-brand-gray-50/50 transition-colors">
                     <td className="px-6 py-3.5 font-bold text-brand-blue-900">
-                      {item.timeSlot}
+                      {item.month}
                     </td>
                     <td className="px-6 py-3.5 font-medium">
                       {item.accidentCount}
                     </td>
                     <td className="px-6 py-3.5">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-xs tracking-wider ${getRiskBadgeStyles(item.timeRiskLevel)}`}>
-                        {item.timeRiskLevel}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border shadow-xs tracking-wider ${getRiskBadgeStyles(item.monthRiskLevel)}`}>
+                        {item.monthRiskLevel}
                       </span>
                     </td>
                   </tr>
@@ -246,4 +201,4 @@ const AdminTimeBasedAnalysis: React.FC = () => {
   );
 };
 
-export default AdminTimeBasedAnalysis;
+export default PublicMonthBasedAnalysis;

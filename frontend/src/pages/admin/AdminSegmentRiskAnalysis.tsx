@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../../services/api";
-import { Search, AlertCircle, ArrowUpDown, RefreshCw, CheckCircle, HelpCircle } from "lucide-react";
+import { Search, AlertCircle, ArrowUpDown, RefreshCw, CheckCircle } from "lucide-react";
 
 interface SegmentRiskAnalysisItem {
   resultId: number;

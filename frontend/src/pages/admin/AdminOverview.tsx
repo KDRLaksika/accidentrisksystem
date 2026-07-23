@@ -28,6 +28,27 @@ interface TimeBasedData {
   timeRiskLevel: string;
 }
 
+interface MonthBasedData {
+  month: string;
+  accidentCount: number;
+  monthRiskLevel: string;
+}
+
+const MONTH_ORDER: { [key: string]: number } = {
+  "January": 1,
+  "February": 2,
+  "March": 3,
+  "April": 4,
+  "May": 5,
+  "June": 6,
+  "July": 7,
+  "August": 8,
+  "September": 9,
+  "October": 10,
+  "November": 11,
+  "December": 12
+};
+
 const getRegionName = (segmentId: number) => {
   if (segmentId >= 1 && segmentId <= 4) return "Panadura";
   if (segmentId === 18) return "Kalutara";
@@ -38,7 +59,7 @@ const getRegionName = (segmentId: number) => {
 const CustomizedAxisTick = (props: any) => {
   const { x, y, payload } = props;
   const val = Number(payload.value);
-  
+
   let areaLabel = "";
   if (val === 2) {
     areaLabel = "Panadura";
@@ -70,6 +91,7 @@ const AdminOverview: React.FC = () => {
   const [segmentRiskData, setSegmentRiskData] = useState<SegmentRiskData[]>([]);
   const [severityData, setSeverityData] = useState<SeverityData[]>([]);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
+  const [monthBasedData, setMonthBasedData] = useState<MonthBasedData[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,12 +100,13 @@ const AdminOverview: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes] = await Promise.all([
+      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes, monthBasedRes] = await Promise.all([
         api.get<PaginatedResponse<any>>("/api/accident-records?size=1"),
         api.get<PaginatedResponse<any>>("/api/road-segments?size=1"),
         api.get<PaginatedResponse<SegmentRiskData>>("/api/segment-risk-analysis?size=100"),
         api.get<PaginatedResponse<SeverityData>>("/api/accident-severity-analysis?size=100"),
-        api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100")
+        api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100"),
+        api.get<PaginatedResponse<MonthBasedData>>("/api/month-based-risk-analysis?size=100")
       ]);
 
       setTotalAccidents(accidentsRes.data?.totalElements || 0);
@@ -96,6 +119,11 @@ const AdminOverview: React.FC = () => {
       setSeverityData(sortedSeverity);
 
       setTimeBasedData(timeBasedRes.data?.content || []);
+
+      const sortedMonthBased = (monthBasedRes.data?.content || []).sort((a, b) => {
+        return (MONTH_ORDER[a.month] || 0) - (MONTH_ORDER[b.month] || 0);
+      });
+      setMonthBasedData(sortedMonthBased);
     } catch (err: any) {
       setError("Unable to retrieve aggregate statistics. Database might be uninitialized.");
     } finally {
@@ -107,23 +135,14 @@ const AdminOverview: React.FC = () => {
     fetchData();
   }, []);
 
-  const isDataEmpty = segmentRiskData.length === 0 && timeBasedData.length === 0 && severityData.length === 0;
+  const isDataEmpty = segmentRiskData.length === 0 && timeBasedData.length === 0 && severityData.length === 0 && monthBasedData.length === 0;
 
   return (
     <div className="space-y-6">
       {/* Header section */}
-      <div className="border-b border-brand-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Admin Overview Dashboard</h1>
-          <p className="text-sm text-gray-700 font-semibold mt-1">System monitoring and administrative metrics.</p>
-        </div>
-        <button
-          onClick={fetchData}
-          className="self-start px-4 py-2 border border-brand-gray-200 hover:bg-brand-gray-100 text-gray-700 bg-white rounded text-xs font-semibold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Refresh Stats
-        </button>
+      <div className="border-b border-brand-gray-200 pb-5">
+        <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight">Admin Overview</h1>
+        <p className="text-sm text-gray-700 font-semibold mt-1">System status and analytical visualizations.</p>
       </div>
 
       {/* Loading state */}
@@ -133,87 +152,91 @@ const AdminOverview: React.FC = () => {
           <p className="text-sm font-semibold text-gray-500">Retrieving system statistics...</p>
         </div>
       ) : error ? (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-md flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-bold text-sm">Notice</h4>
+            <h4 className="font-bold text-sm">Error Loading Statistics</h4>
             <p className="text-xs mt-1">{error}</p>
-            <p className="text-[10px] text-gray-400 mt-2">Trigger analysis calculations using the "Analytics Management" tabs to populate charts.</p>
           </div>
         </div>
       ) : (
         <>
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Recorded Accidents</p>
-                  <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalAccidents}</h3>
+          {/* KPI Cards & Admin Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* KPI Cards */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Recorded Accidents</p>
+                    <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalAccidents}</h3>
+                  </div>
+                  <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
+                    <ClipboardList className="w-6 h-6" />
+                  </div>
                 </div>
-                <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
-                  <ClipboardList className="w-6 h-6" />
-                </div>
+                <p className="text-xs text-red-500 mt-6 flex items-center font-medium">
+                  <span>↗ 4.2%</span>
+                  <span className="text-gray-400 ml-1">cumulative database log</span>
+                </p>
               </div>
-              <p className="text-xs text-red-500 mt-6 flex items-center font-medium">
-                <span>↗ 4.2%</span>
-                <span className="text-gray-400 ml-1">cumulative database log</span>
-              </p>
+
+              <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Monitored Segments</p>
+                    <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalSegments}</h3>
+                  </div>
+                  <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
+                    <Map className="w-6 h-6" />
+                  </div>
+                </div>
+                <p className="text-xs text-green-600 mt-6 flex items-center font-medium gap-1">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Verified PostGIS Geometries Active</span>
+                </p>
+              </div>
             </div>
 
+            {/* Quick Actions */}
             <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col justify-between">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Total Monitored Segments</p>
-                  <h3 className="text-4xl font-extrabold text-brand-blue-900 mt-2">{totalSegments}</h3>
-                </div>
-                <div className="p-3 bg-brand-blue-50 text-brand-blue-800 rounded-md">
-                  <Map className="w-6 h-6" />
-                </div>
+              <div>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-4">Quick Management Actions</p>
               </div>
-              <p className="text-xs text-green-600 mt-6 flex items-center font-medium gap-1">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Verified PostGIS Geometries Active</span>
-              </p>
-            </div>
-          </div>
+              <div className="grid grid-cols-1 gap-3">
+                <button
+                  onClick={() => navigate("/admin/records")}
+                  className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+                >
+                  <PlusCircle className="w-6 h-6 text-brand-blue-855 group-hover:text-brand-blue-905 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-sm text-brand-blue-900">Add Accident Record</h4>
+                    <p className="text-xs text-gray-500 mt-0.5">Input a new incident details.</p>
+                  </div>
+                </button>
 
-          {/* Quick Actions Panel */}
-          <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs space-y-4">
-            <h2 className="text-lg font-bold text-brand-blue-900">Administrative Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button
-                onClick={() => navigate("/admin/records")}
-                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
-              >
-                <PlusCircle className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
-                <div>
-                  <h4 className="font-bold text-sm text-brand-blue-900">Add Accident log</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">Register a new road incident.</p>
-                </div>
-              </button>
+                <button
+                  onClick={() => navigate("/admin/ranges")}
+                  className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+                >
+                  <Ruler className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-sm text-brand-blue-900">Manage Boundaries</h4>
+                    <p className="text-xs text-gray-500 mt-0.5">Modify segment kilometer markers.</p>
+                  </div>
+                </button>
 
-              <button
-                onClick={() => navigate("/admin/ranges")}
-                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
-              >
-                <Ruler className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
-                <div>
-                  <h4 className="font-bold text-sm text-brand-blue-900">Manage Boundaries</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">Modify segment kilometer markers.</p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => navigate("/admin/segment-risk")}
-                className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
-              >
-                <RefreshCw className="w-6 h-6 text-brand-blue-850 group-hover:text-brand-blue-900 shrink-0" />
-                <div>
-                  <h4 className="font-bold text-sm text-brand-blue-900">Recalculate Risk</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">Re-run backend risk rule modules.</p>
-                </div>
-              </button>
+                <button
+                  onClick={() => navigate("/admin/segment-risk")}
+                  className="flex items-center gap-3 p-4 border border-brand-gray-200 hover:border-brand-blue-600 hover:bg-brand-blue-50/50 rounded-lg text-left transition-all cursor-pointer group"
+                >
+                  <RefreshCw className="w-6 h-6 text-brand-blue-855 group-hover:text-brand-blue-900 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-sm text-brand-blue-900">Recalculate Risk</h4>
+                    <p className="text-xs text-gray-500 mt-0.5">Re-run backend risk rule modules.</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -240,7 +263,7 @@ const AdminOverview: React.FC = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="segmentId" tick={<CustomizedAxisTick />} height={55} />
                         <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
-                        <Tooltip 
+                        <Tooltip
                           contentStyle={{ fontSize: 12, borderRadius: 6 }}
                           labelFormatter={(value) => {
                             const region = getRegionName(Number(value));
@@ -268,7 +291,7 @@ const AdminOverview: React.FC = () => {
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
                           <XAxis dataKey="segmentId" tick={<CustomizedAxisTick />} height={55} />
                           <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
-                          <Tooltip 
+                          <Tooltip
                             contentStyle={{ fontSize: 12, borderRadius: 6 }}
                             labelFormatter={(value) => {
                               const region = getRegionName(Number(value));
@@ -295,7 +318,21 @@ const AdminOverview: React.FC = () => {
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={timeBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="timeSlot" tick={{ fontSize: 9, fontWeight: "bold", fill: "currentColor" }} className="text-gray-700 dark:text-white" />
+                          <XAxis
+                            dataKey="timeSlot"
+                            ticks={[
+                              "01:00-02:00",
+                              "04:00-05:00",
+                              "07:00-08:00",
+                              "10:00-11:00",
+                              "13:00-14:00",
+                              "16:00-17:00",
+                              "19:00-20:00",
+                              "22:00-23:00"
+                            ]}
+                            tick={{ fontSize: 9, fontWeight: "bold", fill: "currentColor" }}
+                            className="text-gray-700 dark:text-white"
+                          />
                           <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
                           <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
                           <Bar dataKey="accidentCount" fill="#d97706" radius={[4, 4, 0, 0]} name="Accidents" />
@@ -305,10 +342,32 @@ const AdminOverview: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Chart 4: Month based distribution */}
+              {monthBasedData.length > 0 && (
+                <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-bold text-brand-blue-900">Month-Based Accident Distribution</h2>
+                    <p className="text-xs text-gray-700 font-semibold">Comparative accident counts across different calendar months.</p>
+                  </div>
+                  <div className="h-80 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={monthBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" tick={{ fontSize: 10, fontWeight: "bold", fill: "currentColor" }} className="text-gray-700 dark:text-white" />
+                        <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
+                        <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
+                        <Bar dataKey="accidentCount" fill="#6366f1" radius={[4, 4, 0, 0]} name="Accidents" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
       )}
+
     </div>
   );
 };

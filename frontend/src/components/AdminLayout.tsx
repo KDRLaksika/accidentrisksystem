@@ -13,7 +13,8 @@ import {
   Globe,
   Menu,
   Sun,
-  Moon
+  Moon,
+  Calendar
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -52,6 +53,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: "Segment Risk Analysis", path: "/admin/segment-risk", icon: MenuIcon },
     { name: "Severity Analysis", path: "/admin/severity", icon: BarChart3 },
     { name: "Time-Based Analysis", path: "/admin/time-based", icon: Clock },
+    { name: "Month-Based Analysis", path: "/admin/month-risk", icon: Calendar },
   ];
 
   const isActive = (path: string) => {
@@ -67,7 +69,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white border-r border-brand-gray-200">
       {/* Sidebar Header branding */}
-      <div className="p-6 border-b border-brand-gray-205 bg-brand-gray-50/50">
+      <div className="p-6 bg-brand-gray-50/50">
         <p className="text-[10px] font-extrabold text-gray-700 uppercase tracking-widest">Administrator Portal</p>
         <h2 className="text-xl font-bold text-brand-blue-900 tracking-tight mt-1">Management Hub</h2>
         <p className="text-xs text-gray-700 font-semibold mt-0.5">Control Center</p>

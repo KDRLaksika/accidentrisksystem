@@ -17,6 +17,7 @@ import SeverityRiskMap from "./pages/public/SeverityRiskMap";
 import PublicSegmentRiskAnalysis from "./pages/public/PublicSegmentRiskAnalysis";
 import PublicSeverityAnalysis from "./pages/public/PublicSeverityAnalysis";
 import PublicTimeBasedAnalysis from "./pages/public/PublicTimeBasedAnalysis";
+import PublicMonthBasedAnalysis from "./pages/public/PublicMonthBasedAnalysis";
 import MLPrediction from "./pages/public/MLPrediction";
 
 // Login page
@@ -30,6 +31,7 @@ import AdminSegmentRanges from "./pages/admin/AdminSegmentRanges";
 import AdminSegmentRiskAnalysis from "./pages/admin/AdminSegmentRiskAnalysis";
 import AdminSeverityAnalysis from "./pages/admin/AdminSeverityAnalysis";
 import AdminTimeBasedAnalysis from "./pages/admin/AdminTimeBasedAnalysis";
+import AdminMonthBasedAnalysis from "./pages/admin/AdminMonthBasedAnalysis";
 import AdminProfile from "./pages/admin/AdminProfile";
 
 function App() {
@@ -101,6 +103,14 @@ function App() {
             element={
               <PublicLayout>
                 <PublicTimeBasedAnalysis />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/month-risk"
+            element={
+              <PublicLayout>
+                <PublicMonthBasedAnalysis />
               </PublicLayout>
             }
           />
@@ -183,6 +193,16 @@ function App() {
               <ProtectedRoute>
                 <AdminLayout>
                   <AdminTimeBasedAnalysis />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/month-risk"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminMonthBasedAnalysis />
                 </AdminLayout>
               </ProtectedRoute>
             }

@@ -77,10 +77,10 @@ const MLPrediction: React.FC = () => {
       <div className="border-b border-brand-gray-200 pb-5">
         <h1 className="text-3xl font-bold text-brand-blue-900 tracking-tight flex items-center gap-2">
           <BrainCircuit className="w-8 h-8 text-brand-blue-800 shrink-0" />
-          Accident Risk Prediction
+          Accident Occurrence Risk Prediction
         </h1>
         <p className="text-sm text-gray-700 font-semibold mt-1">
-          Live machine learning accident risk predictions powered by a Random Forest Classifier trained on historical corridor logs.
+          Live machine learning accident occurrence risk predictions based on historical corridor logs between Panadura and Aluthgama section of A2 road in Sri Lanka.
         </p>
       </div>
 
@@ -181,7 +181,7 @@ const MLPrediction: React.FC = () => {
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                   Prediction Completed
                 </span>
-                
+
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-xs font-semibold text-gray-500">Segment {segmentId} Risk Class:</span>
                   <span

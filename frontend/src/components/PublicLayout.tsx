@@ -10,7 +10,8 @@ import {
   Brain,
   LogIn,
   Sun,
-  Moon
+  Moon,
+  Calendar
 } from "lucide-react";
 
 interface PublicLayoutProps {
@@ -47,7 +48,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: "Segment Risk Analysis", path: "/segment-risk", icon: Menu },
     { name: "Severity Analysis", path: "/severity-analysis", icon: BarChart3 },
     { name: "Time-Based Analysis", path: "/time-based", icon: Clock },
-    { name: "ML Prediction", path: "/ml-prediction", icon: Brain },
+    { name: "Month-Based Analysis", path: "/month-risk", icon: Calendar },
+    { name: "Accident Occurrence Prediction", path: "/ml-prediction", icon: Brain },
   ];
 
   const isActive = (path: string) => {
@@ -75,8 +77,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all relative ${active
-                    ? "bg-brand-blue-50 text-brand-blue-900 border-l-4 border-brand-blue-800 -ml-1 pl-2"
-                    : "text-gray-600 hover:bg-brand-gray-100 hover:text-gray-900"
+                  ? "bg-brand-blue-50 text-brand-blue-900 border-l-4 border-brand-blue-800 -ml-1 pl-2"
+                  : "text-gray-600 hover:bg-brand-gray-100 hover:text-gray-900"
                   }`}
               >
                 <Icon className={`w-5 h-5 ${active ? "text-brand-blue-800" : "text-gray-400"}`} />
@@ -98,8 +100,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all relative ${active
-                      ? "bg-brand-blue-50 text-brand-blue-900 border-l-4 border-brand-blue-800 -ml-1 pl-2"
-                      : "text-gray-600 hover:bg-brand-gray-100 hover:text-gray-900"
+                    ? "bg-brand-blue-50 text-brand-blue-900 border-l-4 border-brand-blue-800 -ml-1 pl-2"
+                    : "text-gray-600 hover:bg-brand-gray-100 hover:text-gray-900"
                     }`}
                 >
                   <Icon className={`w-5 h-5 ${active ? "text-brand-blue-800" : "text-gray-400"}`} />
@@ -114,7 +116,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
       {/* Sidebar Footer Link to Admin Login */}
       <div className="p-4 border-t border-brand-gray-200 bg-brand-gray-50">
         <Link
-          to="/login"
+          to="/admin"
           className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-brand-blue-800 hover:bg-brand-blue-900 text-white rounded text-xs font-bold shadow-xs transition-colors cursor-pointer"
         >
           <LogIn className="w-3.5 h-3.5" />
@@ -145,8 +147,8 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             <Link
               to="/"
               className={`text-sm font-bold border-b-2 px-1 py-5 -mb-[1px] transition-colors leading-none ${location.pathname === "/"
-                  ? "border-brand-blue-800 text-brand-blue-900"
-                  : "border-transparent text-gray-500 hover:text-gray-900"
+                ? "border-brand-blue-800 text-brand-blue-900"
+                : "border-transparent text-gray-500 hover:text-gray-900"
                 }`}
             >
               Dashboard

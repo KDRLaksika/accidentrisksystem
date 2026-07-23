@@ -237,10 +237,10 @@ const PublicSeverityAnalysis: React.FC = () => {
                     <td className="px-6 py-3 font-semibold text-brand-blue-900">
                       Segment {item.segmentId}
                     </td>
-                    <td className="px-6 py-3 font-medium text-red-600">
+                    <td className="px-6 py-3 font-medium">
                       {item.fatalCount}
                     </td>
-                    <td className="px-6 py-3 font-medium text-orange-600">
+                    <td className="px-6 py-3 font-medium">
                       {item.seriousCount}
                     </td>
                     <td className="px-6 py-3">

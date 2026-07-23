@@ -27,6 +27,27 @@ interface TimeBasedData {
   timeRiskLevel: string;
 }
 
+interface MonthBasedData {
+  month: string;
+  accidentCount: number;
+  monthRiskLevel: string;
+}
+
+const MONTH_ORDER: { [key: string]: number } = {
+  "January": 1,
+  "February": 2,
+  "March": 3,
+  "April": 4,
+  "May": 5,
+  "June": 6,
+  "July": 7,
+  "August": 8,
+  "September": 9,
+  "October": 10,
+  "November": 11,
+  "December": 12
+};
+
 const getRegionName = (segmentId: number) => {
   if (segmentId >= 1 && segmentId <= 4) return "Panadura";
   if (segmentId === 18) return "Kalutara";
@@ -67,6 +88,7 @@ const PublicOverview: React.FC = () => {
   const [segmentRiskData, setSegmentRiskData] = useState<SegmentRiskData[]>([]);
   const [severityData, setSeverityData] = useState<SeverityData[]>([]);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
+  const [monthBasedData, setMonthBasedData] = useState<MonthBasedData[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,12 +98,13 @@ const PublicOverview: React.FC = () => {
     setError(null);
     try {
       // Fetch total counts
-      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes] = await Promise.all([
+      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes, monthBasedRes] = await Promise.all([
         api.get<PaginatedResponse<any>>("/api/accident-records?size=1"),
         api.get<PaginatedResponse<any>>("/api/road-segments?size=1"),
         api.get<PaginatedResponse<SegmentRiskData>>("/api/segment-risk-analysis?size=100"),
         api.get<PaginatedResponse<SeverityData>>("/api/accident-severity-analysis?size=100"),
-        api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100")
+        api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100"),
+        api.get<PaginatedResponse<MonthBasedData>>("/api/month-based-risk-analysis?size=100")
       ]);
 
       setTotalAccidents(accidentsRes.data?.totalElements || 0);
@@ -96,6 +119,12 @@ const PublicOverview: React.FC = () => {
       setSeverityData(sortedSeverity);
 
       setTimeBasedData(timeBasedRes.data?.content || []);
+
+      // Sort month-based data by calendar month order
+      const sortedMonthBased = (monthBasedRes.data?.content || []).sort((a, b) => {
+        return (MONTH_ORDER[a.month] || 0) - (MONTH_ORDER[b.month] || 0);
+      });
+      setMonthBasedData(sortedMonthBased);
     } catch (err: any) {
       setError("Unable to retrieve aggregate statistics. The database might be offline or empty.");
     } finally {
@@ -107,7 +136,7 @@ const PublicOverview: React.FC = () => {
     fetchData();
   }, []);
 
-  const isDataEmpty = segmentRiskData.length === 0 && timeBasedData.length === 0 && severityData.length === 0;
+  const isDataEmpty = segmentRiskData.length === 0 && timeBasedData.length === 0 && severityData.length === 0 && monthBasedData.length === 0;
 
   return (
     <div className="space-y-6">
@@ -235,7 +264,6 @@ const PublicOverview: React.FC = () => {
                     </div>
                   </div>
                 )}
-
                 {/* Chart 3: Time based distribution */}
                 {timeBasedData.length > 0 && (
                   <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
@@ -247,7 +275,21 @@ const PublicOverview: React.FC = () => {
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={timeBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                          <XAxis dataKey="timeSlot" tick={{ fontSize: 9, fontWeight: "bold", fill: "currentColor" }} className="text-gray-700 dark:text-white" />
+                          <XAxis
+                            dataKey="timeSlot"
+                            ticks={[
+                              "01:00-02:00",
+                              "04:00-05:00",
+                              "07:00-08:00",
+                              "10:00-11:00",
+                              "13:00-14:00",
+                              "16:00-17:00",
+                              "19:00-20:00",
+                              "22:00-23:00"
+                            ]}
+                            tick={{ fontSize: 9, fontWeight: "bold", fill: "currentColor" }}
+                            className="text-gray-700 dark:text-white"
+                          />
                           <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
                           <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
                           <Bar dataKey="accidentCount" fill="#d97706" radius={[4, 4, 0, 0]} name="Accidents" />
@@ -257,6 +299,27 @@ const PublicOverview: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Chart 4: Month based distribution */}
+              {monthBasedData.length > 0 && (
+                <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-bold text-brand-blue-900">Month-Based Accident Distribution</h2>
+                    <p className="text-xs text-gray-700 font-semibold">Comparative accident counts across different calendar months.</p>
+                  </div>
+                  <div className="h-80 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={monthBasedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" tick={{ fontSize: 10, fontWeight: "bold", fill: "currentColor" }} className="text-gray-700 dark:text-white" />
+                        <YAxis tick={{ fontSize: 11, fill: "currentColor" }} className="text-gray-600 dark:text-white" />
+                        <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
+                        <Bar dataKey="accidentCount" fill="#6366f1" radius={[4, 4, 0, 0]} name="Accidents" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
