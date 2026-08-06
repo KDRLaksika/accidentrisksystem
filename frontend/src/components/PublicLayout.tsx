@@ -13,7 +13,8 @@ import {
   Moon,
   Calendar,
   Layers,
-  Sliders
+  Sliders,
+  FileText
 } from "lucide-react";
 
 interface PublicLayoutProps {
@@ -45,6 +46,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: "Segment Risk Map", path: "/map", icon: Map },
     { name: "Severity Risk Map", path: "/severity-map", icon: AlertTriangle },
     { name: "Temporal Risk Heatmap", path: "/temporal-map", icon: Clock },
+    { name: "Safety Audit Reports", path: "/safety-audit-report", icon: FileText },
   ];
 
   const analyticsNavigation = [

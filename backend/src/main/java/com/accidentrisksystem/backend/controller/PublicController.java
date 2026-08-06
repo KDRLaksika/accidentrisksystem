@@ -14,6 +14,8 @@ import com.accidentrisksystem.backend.iservice.IEnvironmentRiskPredictionService
 import com.accidentrisksystem.backend.dto.request.WhatIfSimulationRequestDto;
 import com.accidentrisksystem.backend.dto.response.WhatIfSimulationResponseDto;
 import com.accidentrisksystem.backend.dto.response.TemporalMapAllSlotsResponseDto;
+import com.accidentrisksystem.backend.dto.response.SafetyAuditReportDto;
+import com.accidentrisksystem.backend.iservice.ISafetyAuditReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +26,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PublicController {
 
+    private final IPredictionService predictionService;
     private final SegmentRiskAnalysisRepository segmentRiskAnalysisRepository;
     private final AccidentSeverityAnalysisRepository accidentSeverityAnalysisRepository;
-    private final IPredictionService predictionService;
     private final IEnvironmentRiskPredictionService environmentRiskPredictionService;
+    private final ISafetyAuditReportService safetyAuditReportService;
 
     @GetMapping("/map/segment-risk")
     public ApiResponse<List<MapSegmentRiskResponseDto>> getSegmentRiskMap() {
-
         List<MapSegmentRiskResponseDto> result = segmentRiskAnalysisRepository.findAll()
                 .stream()
                 .map(item -> {
@@ -48,7 +50,6 @@ public class PublicController {
 
     @GetMapping("/map/severity-risk")
     public ApiResponse<List<MapSeverityRiskResponseDto>> getSeverityRiskMap() {
-
         List<MapSeverityRiskResponseDto> result = accidentSeverityAnalysisRepository.findAll()
                 .stream()
                 .map(item -> {
@@ -95,5 +96,14 @@ public class PublicController {
         TemporalMapAllSlotsResponseDto response = environmentRiskPredictionService.getTemporalMapDataAllSlots();
 
         return ApiResponse.success("Temporal risk map data for all slots", response);
+    }
+
+    @GetMapping("/audit-report/data")
+    public ApiResponse<SafetyAuditReportDto> getAuditReportData(
+            @RequestParam(required = false) Integer segmentId
+    ) {
+        SafetyAuditReportDto response = safetyAuditReportService.generateAuditReport(segmentId);
+
+        return ApiResponse.success("Safety audit report data generated successfully", response);
     }
 }

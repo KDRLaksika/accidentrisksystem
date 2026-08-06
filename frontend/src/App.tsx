@@ -23,6 +23,7 @@ import MLPrediction from "./pages/public/MLPrediction";
 import PublicEnvironmentRiskPrediction from "./pages/public/PublicEnvironmentRiskPrediction";
 import PublicWhatIfSimulation from "./pages/public/PublicWhatIfSimulation";
 import TemporalRiskMap from "./pages/public/TemporalRiskMap";
+import PublicSafetyAuditReport from "./pages/public/PublicSafetyAuditReport";
 
 // Login page
 import Login from "./pages/Login";
@@ -164,6 +165,14 @@ function App() {
             element={
               <PublicLayout>
                 <TemporalRiskMap />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/safety-audit-report"
+            element={
+              <PublicLayout>
+                <PublicSafetyAuditReport />
               </PublicLayout>
             }
           />
