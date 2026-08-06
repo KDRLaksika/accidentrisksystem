@@ -14,7 +14,8 @@ import {
   Menu,
   Sun,
   Moon,
-  Calendar
+  Calendar,
+  Layers
 } from "lucide-react";
 
 interface AdminLayoutProps {
@@ -54,6 +55,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: "Severity Analysis", path: "/admin/severity", icon: BarChart3 },
     { name: "Time-Based Analysis", path: "/admin/time-based", icon: Clock },
     { name: "Month-Based Analysis", path: "/admin/month-risk", icon: Calendar },
+    { name: "Road Environment Features", path: "/admin/road-environment", icon: Layers },
   ];
 
   const isActive = (path: string) => {

@@ -1,15 +1,27 @@
 # =========================
 # Python
 # =========================
+
+# Virtual Environments
 mlservice/venv/
-mlservice/__pycache__/
-*.pyc
+mlservice2/venv/
+
+# Python Cache
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# Python Tool Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # =========================
 # Node.js / React
 # =========================
 frontend/node_modules/
 frontend/dist/
+frontend/build/
 
 # =========================
 # Logs
@@ -41,7 +53,14 @@ backend/.mvn/
 *.class
 
 # =========================
-# IntelliJ
+# IntelliJ IDEA
 # =========================
 .idea/
 *.iml
+
+# =========================
+# Temporary Files
+# =========================
+*.tmp
+*.bak
+*.swp

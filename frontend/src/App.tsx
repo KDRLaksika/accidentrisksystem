@@ -18,7 +18,9 @@ import PublicSegmentRiskAnalysis from "./pages/public/PublicSegmentRiskAnalysis"
 import PublicSeverityAnalysis from "./pages/public/PublicSeverityAnalysis";
 import PublicTimeBasedAnalysis from "./pages/public/PublicTimeBasedAnalysis";
 import PublicMonthBasedAnalysis from "./pages/public/PublicMonthBasedAnalysis";
+import PublicRoadEnvironmentFeatures from "./pages/public/PublicRoadEnvironmentFeatures";
 import MLPrediction from "./pages/public/MLPrediction";
+import PublicEnvironmentRiskPrediction from "./pages/public/PublicEnvironmentRiskPrediction";
 
 // Login page
 import Login from "./pages/Login";
@@ -32,6 +34,7 @@ import AdminSegmentRiskAnalysis from "./pages/admin/AdminSegmentRiskAnalysis";
 import AdminSeverityAnalysis from "./pages/admin/AdminSeverityAnalysis";
 import AdminTimeBasedAnalysis from "./pages/admin/AdminTimeBasedAnalysis";
 import AdminMonthBasedAnalysis from "./pages/admin/AdminMonthBasedAnalysis";
+import AdminRoadEnvironmentFeatures from "./pages/admin/AdminRoadEnvironmentFeatures";
 import AdminProfile from "./pages/admin/AdminProfile";
 
 function App() {
@@ -115,10 +118,26 @@ function App() {
             }
           />
           <Route
+            path="/road-environment"
+            element={
+              <PublicLayout>
+                <PublicRoadEnvironmentFeatures />
+              </PublicLayout>
+            }
+          />
+          <Route
             path="/ml-prediction"
             element={
               <PublicLayout>
                 <MLPrediction />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/environment-risk"
+            element={
+              <PublicLayout>
+                <PublicEnvironmentRiskPrediction />
               </PublicLayout>
             }
           />
@@ -203,6 +222,16 @@ function App() {
               <ProtectedRoute>
                 <AdminLayout>
                   <AdminMonthBasedAnalysis />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/road-environment"
+            element={
+              <ProtectedRoute>
+                <AdminLayout>
+                  <AdminRoadEnvironmentFeatures />
                 </AdminLayout>
               </ProtectedRoute>
             }

@@ -11,7 +11,8 @@ import {
   LogIn,
   Sun,
   Moon,
-  Calendar
+  Calendar,
+  Layers
 } from "lucide-react";
 
 interface PublicLayoutProps {
@@ -49,7 +50,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: "Severity Analysis", path: "/severity-analysis", icon: BarChart3 },
     { name: "Time-Based Analysis", path: "/time-based", icon: Clock },
     { name: "Month-Based Analysis", path: "/month-risk", icon: Calendar },
+    { name: "Road Environment Features", path: "/road-environment", icon: Layers },
     { name: "Accident Occurrence Prediction", path: "/ml-prediction", icon: Brain },
+    { name: "Accident Environment Risk Prediction", path: "/environment-risk", icon: Brain },
   ];
 
   const isActive = (path: string) => {

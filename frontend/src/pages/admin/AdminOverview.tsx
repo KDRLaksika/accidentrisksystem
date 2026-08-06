@@ -92,6 +92,7 @@ const AdminOverview: React.FC = () => {
   const [severityData, setSeverityData] = useState<SeverityData[]>([]);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedData[]>([]);
   const [monthBasedData, setMonthBasedData] = useState<MonthBasedData[]>([]);
+  const [environmentCount, setEnvironmentCount] = useState<number>(0);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -100,17 +101,19 @@ const AdminOverview: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes, monthBasedRes] = await Promise.all([
+      const [accidentsRes, segmentsRes, segmentRiskRes, severityRes, timeBasedRes, monthBasedRes, environmentRes] = await Promise.all([
         api.get<PaginatedResponse<any>>("/api/accident-records?size=1"),
         api.get<PaginatedResponse<any>>("/api/road-segments?size=1"),
         api.get<PaginatedResponse<SegmentRiskData>>("/api/segment-risk-analysis?size=100"),
         api.get<PaginatedResponse<SeverityData>>("/api/accident-severity-analysis?size=100"),
         api.get<PaginatedResponse<TimeBasedData>>("/api/time-based-risk-analysis?size=100"),
-        api.get<PaginatedResponse<MonthBasedData>>("/api/month-based-risk-analysis?size=100")
+        api.get<PaginatedResponse<MonthBasedData>>("/api/month-based-risk-analysis?size=100"),
+        api.get<any[]>("/api/road-environment-features/all")
       ]);
 
       setTotalAccidents(accidentsRes.data?.totalElements || 0);
       setTotalSegments(segmentsRes.data?.totalElements || 36);
+      setEnvironmentCount(environmentRes.data?.length || 0);
 
       const sortedSegmentRisk = (segmentRiskRes.data?.content || []).sort((a, b) => a.segmentId - b.segmentId);
       setSegmentRiskData(sortedSegmentRisk);
@@ -363,6 +366,22 @@ const AdminOverview: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Section 5: Road Environment Features Management */}
+              <div className="bg-white p-6 rounded-lg border border-brand-gray-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold text-brand-blue-900">Road Environment Features</h2>
+                  <p className="text-xs text-gray-700 font-semibold mt-0.5">
+                    Field survey environment characteristics, infrastructure POI counts, geometry & land-use percentages.
+                  </p>
+                </div>
+                <a
+                  href="/admin/road-environment"
+                  className="px-4 py-2 bg-brand-blue-800 hover:bg-brand-blue-900 text-white rounded text-xs font-bold shadow-xs whitespace-nowrap transition-colors"
+                >
+                  Manage Environment Features ({environmentCount} Segments Configured)
+                </a>
+              </div>
             </div>
           )}
         </>

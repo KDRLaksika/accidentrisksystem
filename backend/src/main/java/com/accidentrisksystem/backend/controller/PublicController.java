@@ -8,6 +8,9 @@ import com.accidentrisksystem.backend.dto.response.PredictionResponseDto;
 import com.accidentrisksystem.backend.iservice.IPredictionService;
 import com.accidentrisksystem.backend.repository.AccidentSeverityAnalysisRepository;
 import com.accidentrisksystem.backend.repository.SegmentRiskAnalysisRepository;
+import com.accidentrisksystem.backend.dto.request.EnvironmentRiskPredictionRequestDto;
+import com.accidentrisksystem.backend.dto.response.EnvironmentRiskPredictionResponseDto;
+import com.accidentrisksystem.backend.iservice.IEnvironmentRiskPredictionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,7 @@ public class PublicController {
     private final SegmentRiskAnalysisRepository segmentRiskAnalysisRepository;
     private final AccidentSeverityAnalysisRepository accidentSeverityAnalysisRepository;
     private final IPredictionService predictionService;
+    private final IEnvironmentRiskPredictionService environmentRiskPredictionService;
 
     @GetMapping("/map/segment-risk")
     public ApiResponse<List<MapSegmentRiskResponseDto>> getSegmentRiskMap() {
@@ -63,5 +67,14 @@ public class PublicController {
         PredictionResponseDto response = predictionService.predict(request);
 
         return ApiResponse.success("Prediction completed successfully", response);
+    }
+
+    @PostMapping("/environment-risk/predict")
+    public ApiResponse<EnvironmentRiskPredictionResponseDto> predictEnvironmentRisk(
+            @RequestBody EnvironmentRiskPredictionRequestDto request
+    ) {
+        EnvironmentRiskPredictionResponseDto response = environmentRiskPredictionService.predict(request);
+
+        return ApiResponse.success("Environment risk prediction completed successfully", response);
     }
 }
