@@ -13,6 +13,7 @@ import com.accidentrisksystem.backend.dto.response.EnvironmentRiskPredictionResp
 import com.accidentrisksystem.backend.iservice.IEnvironmentRiskPredictionService;
 import com.accidentrisksystem.backend.dto.request.WhatIfSimulationRequestDto;
 import com.accidentrisksystem.backend.dto.response.WhatIfSimulationResponseDto;
+import com.accidentrisksystem.backend.dto.response.TemporalMapAllSlotsResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,5 +88,12 @@ public class PublicController {
         WhatIfSimulationResponseDto response = environmentRiskPredictionService.simulateCountermeasures(request);
 
         return ApiResponse.success("Countermeasure simulation completed successfully", response);
+    }
+
+    @GetMapping("/map/temporal-risk/all-slots")
+    public ApiResponse<TemporalMapAllSlotsResponseDto> getTemporalMapAllSlots() {
+        TemporalMapAllSlotsResponseDto response = environmentRiskPredictionService.getTemporalMapDataAllSlots();
+
+        return ApiResponse.success("Temporal risk map data for all slots", response);
     }
 }

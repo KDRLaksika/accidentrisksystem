@@ -22,6 +22,7 @@ import PublicRoadEnvironmentFeatures from "./pages/public/PublicRoadEnvironmentF
 import MLPrediction from "./pages/public/MLPrediction";
 import PublicEnvironmentRiskPrediction from "./pages/public/PublicEnvironmentRiskPrediction";
 import PublicWhatIfSimulation from "./pages/public/PublicWhatIfSimulation";
+import TemporalRiskMap from "./pages/public/TemporalRiskMap";
 
 // Login page
 import Login from "./pages/Login";
@@ -67,6 +68,14 @@ function App() {
             element={
               <PublicLayout>
                 <PublicAccidentRecords />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/map"
+            element={
+              <PublicLayout>
+                <SegmentRiskMap />
               </PublicLayout>
             }
           />
@@ -147,6 +156,14 @@ function App() {
             element={
               <PublicLayout>
                 <PublicWhatIfSimulation />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/temporal-map"
+            element={
+              <PublicLayout>
+                <TemporalRiskMap />
               </PublicLayout>
             }
           />

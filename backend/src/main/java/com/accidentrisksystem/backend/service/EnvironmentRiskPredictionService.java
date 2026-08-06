@@ -15,9 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.accidentrisksystem.backend.dto.request.WhatIfSimulationRequestDto;
 import com.accidentrisksystem.backend.dto.response.WhatIfSimulationResponseDto;
+import com.accidentrisksystem.backend.dto.response.TemporalMapAllSlotsResponseDto;
+import com.accidentrisksystem.backend.dto.response.TemporalMapSegmentResponseDto;
+import com.accidentrisksystem.backend.entity.RoadSegment;
 
 @Service
 @RequiredArgsConstructor
@@ -219,6 +223,88 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
         if (!roadSegmentRepository.existsById(request.getSegmentId())) {
             throw new ResourceNotFoundException("Segment does not exist with ID: " + request.getSegmentId());
         }
+    }
+
+    private volatile TemporalMapAllSlotsResponseDto cachedTemporalMapData = null;
+    private volatile long lastCacheTime = 0L;
+    private static final long CACHE_TTL_MS = 15 * 60 * 1000L; // 15 minutes TTL
+
+    @Override
+    public TemporalMapAllSlotsResponseDto getTemporalMapDataAllSlots() {
+        long now = System.currentTimeMillis();
+        if (cachedTemporalMapData != null && (now - lastCacheTime) < CACHE_TTL_MS) {
+            return cachedTemporalMapData;
+        }
+
+        List<RoadSegment> segments = roadSegmentRepository.findAll();
+        Map<Integer, RoadEnvironmentFeatures> envMap = new HashMap<>();
+        environmentFeaturesRepository.findAll().forEach(env -> {
+            if (env.getRoadSegment() != null) {
+                envMap.put(env.getRoadSegment().getSegmentId(), env);
+            }
+        });
+
+        Map<String, List<TemporalMapSegmentResponseDto>> timeSlotMap = new ConcurrentHashMap<>();
+
+        VALID_TIME_CATEGORIES.parallelStream().forEach(timeCategory -> {
+            List<TemporalMapSegmentResponseDto> segmentDtos = new ArrayList<>();
+
+            for (RoadSegment segment : segments) {
+                RoadEnvironmentFeatures env = envMap.get(segment.getSegmentId());
+
+                String geomText = segment.getGeometry() != null ? segment.getGeometry().toText() : "";
+
+                int jc = (env != null && env.getJunctionCount() != null) ? env.getJunctionCount() : 0;
+                int sc = (env != null && env.getSchoolCount() != null) ? env.getSchoolCount() : 0;
+                int hc = (env != null && env.getHospitalCount() != null) ? env.getHospitalCount() : 0;
+                int rc = (env != null && env.getRailwayCrossingCount() != null) ? env.getRailwayCrossingCount() : 0;
+                int bc = (env != null && env.getBridgeCount() != null) ? env.getBridgeCount() : 0;
+                int ts = (env != null && env.getTrafficSignalCount() != null) ? env.getTrafficSignalCount() : 0;
+                int pc = (env != null && env.getPedestrianCrossingCount() != null) ? env.getPedestrianCrossingCount() : 0;
+                int cc = (env != null && env.getCurveCount() != null) ? env.getCurveCount() : 0;
+
+                double str = (env != null && env.getStraightRoadPercentage() != null) ? env.getStraightRoadPercentage().doubleValue() : 0.0;
+                double nrw = (env != null && env.getNarrowRoadPercentage() != null) ? env.getNarrowRoadPercentage().doubleValue() : 0.0;
+                double wde = (env != null && env.getWideRoadPercentage() != null) ? env.getWideRoadPercentage().doubleValue() : 0.0;
+                double urb = (env != null && env.getUrbanPercentage() != null) ? env.getUrbanPercentage().doubleValue() : 0.0;
+                double rur = (env != null && env.getRuralPercentage() != null) ? env.getRuralPercentage().doubleValue() : 0.0;
+
+                try {
+                    EnvironmentRiskPredictionResponseDto pred = executePrediction(
+                            segment.getSegmentId(), timeCategory,
+                            jc, sc, hc, rc, bc, ts, pc, cc,
+                            str, nrw, wde, urb, rur
+                    );
+
+                    segmentDtos.add(new TemporalMapSegmentResponseDto(
+                            segment.getSegmentId(),
+                            geomText,
+                            pred.getPredictedRiskLevel(),
+                            pred.getClassProbabilities()
+                    ));
+                } catch (Exception e) {
+                    segmentDtos.add(new TemporalMapSegmentResponseDto(
+                            segment.getSegmentId(),
+                            geomText,
+                            "Low",
+                            Map.of("Low", 100.0)
+                    ));
+                }
+            }
+
+            timeSlotMap.put(timeCategory, segmentDtos);
+        });
+
+        Map<String, List<TemporalMapSegmentResponseDto>> orderedSlotMap = new LinkedHashMap<>();
+        for (String slot : VALID_TIME_CATEGORIES) {
+            orderedSlotMap.put(slot, timeSlotMap.getOrDefault(slot, Collections.emptyList()));
+        }
+
+        TemporalMapAllSlotsResponseDto response = new TemporalMapAllSlotsResponseDto(orderedSlotMap);
+        this.cachedTemporalMapData = response;
+        this.lastCacheTime = now;
+
+        return response;
     }
 
     private void validateWhatIfRequest(WhatIfSimulationRequestDto request) {

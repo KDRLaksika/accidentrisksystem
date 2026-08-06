@@ -44,6 +44,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: "Accident Records", path: "/records", icon: Clock },
     { name: "Segment Risk Map", path: "/map", icon: Map },
     { name: "Severity Risk Map", path: "/severity-map", icon: AlertTriangle },
+    { name: "Temporal Risk Heatmap", path: "/temporal-map", icon: Clock },
   ];
 
   const analyticsNavigation = [
