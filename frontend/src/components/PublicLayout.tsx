@@ -12,7 +12,8 @@ import {
   Sun,
   Moon,
   Calendar,
-  Layers
+  Layers,
+  Sliders
 } from "lucide-react";
 
 interface PublicLayoutProps {
@@ -41,7 +42,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   const navigation = [
     { name: "Overview", path: "/", icon: LayoutDashboard },
     { name: "Accident Records", path: "/records", icon: Clock },
-    { name: "Segment Risk Map", path: "/risk-map", icon: Map },
+    { name: "Segment Risk Map", path: "/map", icon: Map },
     { name: "Severity Risk Map", path: "/severity-map", icon: AlertTriangle },
   ];
 
@@ -53,6 +54,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: "Road Environment Features", path: "/road-environment", icon: Layers },
     { name: "Accident Occurrence Prediction", path: "/ml-prediction", icon: Brain },
     { name: "Accident Environment Risk Prediction", path: "/environment-risk", icon: Brain },
+    { name: "What-If Countermeasure Simulator", path: "/what-if-simulation", icon: Sliders },
   ];
 
   const isActive = (path: string) => {

@@ -21,6 +21,7 @@ import PublicMonthBasedAnalysis from "./pages/public/PublicMonthBasedAnalysis";
 import PublicRoadEnvironmentFeatures from "./pages/public/PublicRoadEnvironmentFeatures";
 import MLPrediction from "./pages/public/MLPrediction";
 import PublicEnvironmentRiskPrediction from "./pages/public/PublicEnvironmentRiskPrediction";
+import PublicWhatIfSimulation from "./pages/public/PublicWhatIfSimulation";
 
 // Login page
 import Login from "./pages/Login";
@@ -138,6 +139,14 @@ function App() {
             element={
               <PublicLayout>
                 <PublicEnvironmentRiskPrediction />
+              </PublicLayout>
+            }
+          />
+          <Route
+            path="/what-if-simulation"
+            element={
+              <PublicLayout>
+                <PublicWhatIfSimulation />
               </PublicLayout>
             }
           />

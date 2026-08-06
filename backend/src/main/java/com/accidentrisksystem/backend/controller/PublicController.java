@@ -11,6 +11,8 @@ import com.accidentrisksystem.backend.repository.SegmentRiskAnalysisRepository;
 import com.accidentrisksystem.backend.dto.request.EnvironmentRiskPredictionRequestDto;
 import com.accidentrisksystem.backend.dto.response.EnvironmentRiskPredictionResponseDto;
 import com.accidentrisksystem.backend.iservice.IEnvironmentRiskPredictionService;
+import com.accidentrisksystem.backend.dto.request.WhatIfSimulationRequestDto;
+import com.accidentrisksystem.backend.dto.response.WhatIfSimulationResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,5 +78,14 @@ public class PublicController {
         EnvironmentRiskPredictionResponseDto response = environmentRiskPredictionService.predict(request);
 
         return ApiResponse.success("Environment risk prediction completed successfully", response);
+    }
+
+    @PostMapping("/environment-risk/simulate")
+    public ApiResponse<WhatIfSimulationResponseDto> simulateCountermeasures(
+            @RequestBody WhatIfSimulationRequestDto request
+    ) {
+        WhatIfSimulationResponseDto response = environmentRiskPredictionService.simulateCountermeasures(request);
+
+        return ApiResponse.success("Countermeasure simulation completed successfully", response);
     }
 }
