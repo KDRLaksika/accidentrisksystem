@@ -61,12 +61,9 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
                 envFeatures.getBridgeCount() != null ? envFeatures.getBridgeCount() : 0,
                 envFeatures.getTrafficSignalCount() != null ? envFeatures.getTrafficSignalCount() : 0,
                 envFeatures.getPedestrianCrossingCount() != null ? envFeatures.getPedestrianCrossingCount() : 0,
-                envFeatures.getCurveCount() != null ? envFeatures.getCurveCount() : 0,
                 envFeatures.getStraightRoadPercentage() != null ? envFeatures.getStraightRoadPercentage().doubleValue() : 0.0,
-                envFeatures.getNarrowRoadPercentage() != null ? envFeatures.getNarrowRoadPercentage().doubleValue() : 0.0,
                 envFeatures.getWideRoadPercentage() != null ? envFeatures.getWideRoadPercentage().doubleValue() : 0.0,
-                envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0,
-                envFeatures.getRuralPercentage() != null ? envFeatures.getRuralPercentage().doubleValue() : 0.0
+                envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0
         );
     }
 
@@ -89,12 +86,9 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
                 envFeatures.getBridgeCount() != null ? envFeatures.getBridgeCount() : 0,
                 envFeatures.getTrafficSignalCount() != null ? envFeatures.getTrafficSignalCount() : 0,
                 envFeatures.getPedestrianCrossingCount() != null ? envFeatures.getPedestrianCrossingCount() : 0,
-                envFeatures.getCurveCount() != null ? envFeatures.getCurveCount() : 0,
                 envFeatures.getStraightRoadPercentage() != null ? envFeatures.getStraightRoadPercentage().doubleValue() : 0.0,
-                envFeatures.getNarrowRoadPercentage() != null ? envFeatures.getNarrowRoadPercentage().doubleValue() : 0.0,
                 envFeatures.getWideRoadPercentage() != null ? envFeatures.getWideRoadPercentage().doubleValue() : 0.0,
-                envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0,
-                envFeatures.getRuralPercentage() != null ? envFeatures.getRuralPercentage().doubleValue() : 0.0
+                envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0
         );
 
         // Simulated (User overridden values, falling back to baseline if null)
@@ -107,12 +101,9 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
                 request.getBridgeCount() != null ? request.getBridgeCount() : (envFeatures.getBridgeCount() != null ? envFeatures.getBridgeCount() : 0),
                 request.getTrafficSignalCount() != null ? request.getTrafficSignalCount() : (envFeatures.getTrafficSignalCount() != null ? envFeatures.getTrafficSignalCount() : 0),
                 request.getPedestrianCrossingCount() != null ? request.getPedestrianCrossingCount() : (envFeatures.getPedestrianCrossingCount() != null ? envFeatures.getPedestrianCrossingCount() : 0),
-                request.getCurveCount() != null ? request.getCurveCount() : (envFeatures.getCurveCount() != null ? envFeatures.getCurveCount() : 0),
                 request.getStraightRoadPercentage() != null ? request.getStraightRoadPercentage() : (envFeatures.getStraightRoadPercentage() != null ? envFeatures.getStraightRoadPercentage().doubleValue() : 0.0),
-                request.getNarrowRoadPercentage() != null ? request.getNarrowRoadPercentage() : (envFeatures.getNarrowRoadPercentage() != null ? envFeatures.getNarrowRoadPercentage().doubleValue() : 0.0),
                 request.getWideRoadPercentage() != null ? request.getWideRoadPercentage() : (envFeatures.getWideRoadPercentage() != null ? envFeatures.getWideRoadPercentage().doubleValue() : 0.0),
-                request.getUrbanPercentage() != null ? request.getUrbanPercentage() : (envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0),
-                request.getRuralPercentage() != null ? request.getRuralPercentage() : (envFeatures.getRuralPercentage() != null ? envFeatures.getRuralPercentage().doubleValue() : 0.0)
+                request.getUrbanPercentage() != null ? request.getUrbanPercentage() : (envFeatures.getUrbanPercentage() != null ? envFeatures.getUrbanPercentage().doubleValue() : 0.0)
         );
 
         boolean riskLevelChanged = !baselineResult.getPredictedRiskLevel().equalsIgnoreCase(simulatedResult.getPredictedRiskLevel());
@@ -135,9 +126,8 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
     private EnvironmentRiskPredictionResponseDto executePrediction(
             Integer segmentId, String timeCategory,
             int junctionCount, int schoolCount, int hospitalCount, int railwayCrossingCount,
-            int bridgeCount, int trafficSignalCount, int pedestrianCrossingCount, int curveCount,
-            double straightRoadPercentage, double narrowRoadPercentage, double wideRoadPercentage,
-            double urbanPercentage, double ruralPercentage
+            int bridgeCount, int trafficSignalCount, int pedestrianCrossingCount,
+            double straightRoadPercentage, double wideRoadPercentage, double urbanPercentage
     ) {
         int schoolTime = ("06:00-09:00".equals(timeCategory) || "12:00-15:00".equals(timeCategory)) ? 1 : 0;
         int workRush = ("06:00-09:00".equals(timeCategory) || "15:00-18:00".equals(timeCategory) || "18:00-21:00".equals(timeCategory)) ? 1 : 0;
@@ -154,12 +144,9 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
         fastApiRequest.put("bridge_count", bridgeCount);
         fastApiRequest.put("traffic_signal_count", trafficSignalCount);
         fastApiRequest.put("pedestrian_crossing_count", pedestrianCrossingCount);
-        fastApiRequest.put("curve_count", curveCount);
         fastApiRequest.put("straight_road_percentage", straightRoadPercentage);
-        fastApiRequest.put("narrow_road_percentage", narrowRoadPercentage);
         fastApiRequest.put("wide_road_percentage", wideRoadPercentage);
         fastApiRequest.put("urban_percentage", urbanPercentage);
-        fastApiRequest.put("rural_percentage", ruralPercentage);
 
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> fastApiResponse;
@@ -261,19 +248,16 @@ public class EnvironmentRiskPredictionService implements IEnvironmentRiskPredict
                 int bc = (env != null && env.getBridgeCount() != null) ? env.getBridgeCount() : 0;
                 int ts = (env != null && env.getTrafficSignalCount() != null) ? env.getTrafficSignalCount() : 0;
                 int pc = (env != null && env.getPedestrianCrossingCount() != null) ? env.getPedestrianCrossingCount() : 0;
-                int cc = (env != null && env.getCurveCount() != null) ? env.getCurveCount() : 0;
 
                 double str = (env != null && env.getStraightRoadPercentage() != null) ? env.getStraightRoadPercentage().doubleValue() : 0.0;
-                double nrw = (env != null && env.getNarrowRoadPercentage() != null) ? env.getNarrowRoadPercentage().doubleValue() : 0.0;
                 double wde = (env != null && env.getWideRoadPercentage() != null) ? env.getWideRoadPercentage().doubleValue() : 0.0;
                 double urb = (env != null && env.getUrbanPercentage() != null) ? env.getUrbanPercentage().doubleValue() : 0.0;
-                double rur = (env != null && env.getRuralPercentage() != null) ? env.getRuralPercentage().doubleValue() : 0.0;
 
                 try {
                     EnvironmentRiskPredictionResponseDto pred = executePrediction(
                             segment.getSegmentId(), timeCategory,
-                            jc, sc, hc, rc, bc, ts, pc, cc,
-                            str, nrw, wde, urb, rur
+                            jc, sc, hc, rc, bc, ts, pc,
+                            str, wde, urb
                     );
 
                     segmentDtos.add(new TemporalMapSegmentResponseDto(

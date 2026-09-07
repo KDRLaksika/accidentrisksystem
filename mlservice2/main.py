@@ -88,14 +88,8 @@ class PredictionRequest(BaseModel):
     bridge_count: int = Field(ge=0)
     traffic_signal_count: int = Field(ge=0)
     pedestrian_crossing_count: int = Field(ge=0)
-    curve_count: int = Field(ge=0)
 
     straight_road_percentage: float = Field(
-        ge=0,
-        le=100
-    )
-
-    narrow_road_percentage: float = Field(
         ge=0,
         le=100
     )
@@ -106,11 +100,6 @@ class PredictionRequest(BaseModel):
     )
 
     urban_percentage: float = Field(
-        ge=0,
-        le=100
-    )
-
-    rural_percentage: float = Field(
         ge=0,
         le=100
     )
@@ -195,17 +184,12 @@ def create_explanation_message(
         "traffic_signal_count": "traffic signals",
         "pedestrian_crossing_count":
             "pedestrian crossings",
-        "curve_count": "road curves",
         "straight_road_percentage":
             "straight-road coverage",
-        "narrow_road_percentage":
-            "narrow-road coverage",
         "wide_road_percentage":
             "wide-road coverage",
         "urban_percentage":
-            "urban-area coverage",
-        "rural_percentage":
-            "rural-area coverage"
+            "urban-area coverage"
     }
 
     readable_feature = readable_names.get(
@@ -481,23 +465,14 @@ def predict(data: PredictionRequest):
         "pedestrian_crossing_count":
             data.pedestrian_crossing_count,
 
-        "curve_count":
-            data.curve_count,
-
         "straight_road_percentage":
             data.straight_road_percentage,
-
-        "narrow_road_percentage":
-            data.narrow_road_percentage,
 
         "wide_road_percentage":
             data.wide_road_percentage,
 
         "urban_percentage":
-            data.urban_percentage,
-
-        "rural_percentage":
-            data.rural_percentage
+            data.urban_percentage
     }])
 
     try:

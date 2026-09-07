@@ -43,23 +43,14 @@ public class RoadEnvironmentFeatures {
     @Column(name = "pedestrian_crossing_count", nullable = false)
     private Integer pedestrianCrossingCount = 0;
 
-    @Column(name = "curve_count", nullable = false)
-    private Integer curveCount = 0;
-
     @Column(name = "straight_road_percentage", nullable = false)
     private BigDecimal straightRoadPercentage = BigDecimal.ZERO;
-
-    @Column(name = "narrow_road_percentage", nullable = false)
-    private BigDecimal narrowRoadPercentage = BigDecimal.ZERO;
 
     @Column(name = "wide_road_percentage", nullable = false)
     private BigDecimal wideRoadPercentage = BigDecimal.ZERO;
 
     @Column(name = "urban_percentage", nullable = false)
     private BigDecimal urbanPercentage = BigDecimal.ZERO;
-
-    @Column(name = "rural_percentage", nullable = false)
-    private BigDecimal ruralPercentage = BigDecimal.ZERO;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

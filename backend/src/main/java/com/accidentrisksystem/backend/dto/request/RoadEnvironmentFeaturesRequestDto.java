@@ -15,10 +15,7 @@ public class RoadEnvironmentFeaturesRequestDto {
     private Integer bridgeCount = 0;
     private Integer trafficSignalCount = 0;
     private Integer pedestrianCrossingCount = 0;
-    private Integer curveCount = 0;
     private Double straightRoadPercentage = 0.00;
-    private Double narrowRoadPercentage = 0.00;
     private Double wideRoadPercentage = 0.00;
     private Double urbanPercentage = 0.00;
-    private Double ruralPercentage = 0.00;
 }

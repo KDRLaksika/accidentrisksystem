@@ -39,12 +39,9 @@ public class SafetyAuditReportDto {
         private int bridgeCount;
         private int trafficSignalCount;
         private int pedestrianCrossingCount;
-        private int curveCount;
         private double straightRoadPercentage;
-        private double narrowRoadPercentage;
         private double wideRoadPercentage;
         private double urbanPercentage;
-        private double ruralPercentage;
         private List<String> segmentRecommendations;
     }
 }

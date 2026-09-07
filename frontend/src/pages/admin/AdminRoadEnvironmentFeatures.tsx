@@ -35,12 +35,9 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
   const [bridgeCount, setBridgeCount] = useState<string>("0");
   const [trafficSignalCount, setTrafficSignalCount] = useState<string>("0");
   const [pedestrianCrossingCount, setPedestrianCrossingCount] = useState<string>("0");
-  const [curveCount, setCurveCount] = useState<string>("0");
   const [straightRoadPercentage, setStraightRoadPercentage] = useState<string>("0.00");
-  const [narrowRoadPercentage, setNarrowRoadPercentage] = useState<string>("0.00");
   const [wideRoadPercentage, setWideRoadPercentage] = useState<string>("0.00");
   const [urbanPercentage, setUrbanPercentage] = useState<string>("0.00");
-  const [ruralPercentage, setRuralPercentage] = useState<string>("0.00");
 
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -108,12 +105,9 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
     setBridgeCount("0");
     setTrafficSignalCount("0");
     setPedestrianCrossingCount("0");
-    setCurveCount("0");
     setStraightRoadPercentage("0.00");
-    setNarrowRoadPercentage("0.00");
     setWideRoadPercentage("0.00");
     setUrbanPercentage("0.00");
-    setRuralPercentage("0.00");
     setFormError(null);
   };
 
@@ -136,12 +130,9 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
     setBridgeCount(item.bridgeCount.toString());
     setTrafficSignalCount(item.trafficSignalCount.toString());
     setPedestrianCrossingCount(item.pedestrianCrossingCount.toString());
-    setCurveCount(item.curveCount.toString());
     setStraightRoadPercentage(item.straightRoadPercentage.toString());
-    setNarrowRoadPercentage(item.narrowRoadPercentage.toString());
     setWideRoadPercentage(item.wideRoadPercentage.toString());
     setUrbanPercentage(item.urbanPercentage.toString());
-    setRuralPercentage(item.ruralPercentage.toString());
     setIsModalOpen(true);
   };
 
@@ -164,12 +155,9 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
       bridgeCount: Number(bridgeCount) || 0,
       trafficSignalCount: Number(trafficSignalCount) || 0,
       pedestrianCrossingCount: Number(pedestrianCrossingCount) || 0,
-      curveCount: Number(curveCount) || 0,
       straightRoadPercentage: Number(straightRoadPercentage) || 0,
-      narrowRoadPercentage: Number(narrowRoadPercentage) || 0,
       wideRoadPercentage: Number(wideRoadPercentage) || 0,
       urbanPercentage: Number(urbanPercentage) || 0,
-      ruralPercentage: Number(ruralPercentage) || 0,
     };
 
     try {
@@ -320,18 +308,14 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
                         <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold border border-emerald-200">
                           Bridges: {item.bridgeCount}
                         </span>
-                        <span className="bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded font-semibold border border-orange-200">
-                          Curves: {item.curveCount}
-                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-[11px] font-medium">
                       <div>Straight: <span className="font-bold">{item.straightRoadPercentage.toFixed(1)}%</span></div>
-                      <div>Narrow: <span className="font-bold">{item.narrowRoadPercentage.toFixed(1)}%</span> | Wide: <span className="font-bold">{item.wideRoadPercentage.toFixed(1)}%</span></div>
+                      <div>Wide: <span className="font-bold">{item.wideRoadPercentage.toFixed(1)}%</span></div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-[11px] font-medium">
                       <div className="text-blue-600 font-bold">Urban: {item.urbanPercentage.toFixed(1)}%</div>
-                      <div className="text-emerald-600 font-bold">Rural: {item.ruralPercentage.toFixed(1)}%</div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-1.5">
@@ -505,16 +489,6 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
                       className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
                     />
                   </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-600 mb-1">Curve Count</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={curveCount}
-                      onChange={(e) => setCurveCount(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -531,18 +505,6 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
                       max="100"
                       value={straightRoadPercentage}
                       onChange={(e) => setStraightRoadPercentage(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-600 mb-1">Narrow Road (%)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      value={narrowRoadPercentage}
-                      onChange={(e) => setNarrowRoadPercentage(e.target.value)}
                       className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
                     />
                   </div>
@@ -567,18 +529,6 @@ const AdminRoadEnvironmentFeatures: React.FC = () => {
                       max="100"
                       value={urbanPercentage}
                       onChange={(e) => setUrbanPercentage(e.target.value)}
-                      className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-gray-600 mb-1">Rural Area (%)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      value={ruralPercentage}
-                      onChange={(e) => setRuralPercentage(e.target.value)}
                       className="w-full px-2.5 py-1.5 border border-brand-gray-200 rounded text-xs"
                     />
                   </div>

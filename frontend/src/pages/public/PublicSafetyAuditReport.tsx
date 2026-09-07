@@ -25,12 +25,9 @@ interface SegmentAuditDetail {
   bridgeCount: number;
   trafficSignalCount: number;
   pedestrianCrossingCount: number;
-  curveCount: number;
   straightRoadPercentage: number;
-  narrowRoadPercentage: number;
   wideRoadPercentage: number;
   urbanPercentage: number;
-  ruralPercentage: number;
   segmentRecommendations: string[];
 }
 
@@ -131,13 +128,13 @@ const PublicSafetyAuditReport: React.FC = () => {
       `${item.junctionCount}`,
       `${item.schoolCount}`,
       `${item.pedestrianCrossingCount}`,
-      `${item.narrowRoadPercentage.toFixed(0)}%`,
+      `${item.wideRoadPercentage.toFixed(0)}%`,
       item.segmentRecommendations.length > 0 ? item.segmentRecommendations[0] : "Maintain standard infrastructure"
     ]);
 
     autoTable(doc, {
       startY: 75,
-      head: [["Segment", "Overall Risk", "Env Risk", "Junctions", "Schools", "Crossings", "Narrow %", "Primary Countermeasure"]],
+      head: [["Segment", "Overall Risk", "Env Risk", "Junctions", "Schools", "Crossings", "Wide %", "Primary Countermeasure"]],
       body: tableRows,
       theme: "striped",
       styles: { fontSize: 7, cellPadding: 2 },
@@ -225,12 +222,9 @@ const PublicSafetyAuditReport: React.FC = () => {
       "Bridges": item.bridgeCount,
       "Traffic Signals": item.trafficSignalCount,
       "Pedestrian Crossings": item.pedestrianCrossingCount,
-      "Curves": item.curveCount,
       "Straight Road %": item.straightRoadPercentage,
-      "Narrow Road %": item.narrowRoadPercentage,
       "Wide Road %": item.wideRoadPercentage,
       "Urban %": item.urbanPercentage,
-      "Rural %": item.ruralPercentage,
       "Recommended Interventions": item.segmentRecommendations.join(" | ")
     }));
     const wsDetails = XLSX.utils.json_to_sheet(segmentDetailsData);
@@ -426,7 +420,7 @@ const PublicSafetyAuditReport: React.FC = () => {
                     <th className="p-3 text-center">Junctions</th>
                     <th className="p-3 text-center">Schools</th>
                     <th className="p-3 text-center">Crossings</th>
-                    <th className="p-3 text-center">Narrow Road %</th>
+                    <th className="p-3 text-center">Wide Road %</th>
                     <th className="p-3">Key Recommended Countermeasure</th>
                   </tr>
                 </thead>
@@ -439,7 +433,7 @@ const PublicSafetyAuditReport: React.FC = () => {
                       <td className="p-3 text-center font-bold">{item.junctionCount}</td>
                       <td className="p-3 text-center font-bold">{item.schoolCount}</td>
                       <td className="p-3 text-center font-bold">{item.pedestrianCrossingCount}</td>
-                      <td className="p-3 text-center font-bold">{item.narrowRoadPercentage.toFixed(0)}%</td>
+                      <td className="p-3 text-center font-bold">{item.wideRoadPercentage.toFixed(0)}%</td>
                       <td className="p-3 text-gray-700 font-medium">
                         {item.segmentRecommendations.length > 0
                           ? item.segmentRecommendations[0]

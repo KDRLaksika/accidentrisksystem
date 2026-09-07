@@ -59,13 +59,10 @@ const PublicWhatIfSimulation: React.FC = () => {
   const [bridgeCount, setBridgeCount] = useState<number>(0);
   const [trafficSignalCount, setTrafficSignalCount] = useState<number>(0);
   const [pedestrianCrossingCount, setPedestrianCrossingCount] = useState<number>(0);
-  const [curveCount, setCurveCount] = useState<number>(0);
 
   const [straightRoadPercentage, setStraightRoadPercentage] = useState<number>(0);
-  const [narrowRoadPercentage, setNarrowRoadPercentage] = useState<number>(0);
   const [wideRoadPercentage, setWideRoadPercentage] = useState<number>(0);
   const [urbanPercentage, setUrbanPercentage] = useState<number>(0);
-  const [ruralPercentage, setRuralPercentage] = useState<number>(0);
 
   const [loading, setLoading] = useState(false);
   const [fetchingSurvey, setFetchingSurvey] = useState(true);
@@ -106,13 +103,10 @@ const PublicWhatIfSimulation: React.FC = () => {
       setBridgeCount(base.bridgeCount || 0);
       setTrafficSignalCount(base.trafficSignalCount || 0);
       setPedestrianCrossingCount(base.pedestrianCrossingCount || 0);
-      setCurveCount(base.curveCount || 0);
 
       setStraightRoadPercentage(base.straightRoadPercentage || 0);
-      setNarrowRoadPercentage(base.narrowRoadPercentage || 0);
       setWideRoadPercentage(base.wideRoadPercentage || 0);
       setUrbanPercentage(base.urbanPercentage || 0);
-      setRuralPercentage(base.ruralPercentage || 0);
     }
   };
 
@@ -144,12 +138,9 @@ const PublicWhatIfSimulation: React.FC = () => {
         bridgeCount,
         trafficSignalCount,
         pedestrianCrossingCount,
-        curveCount,
         straightRoadPercentage,
-        narrowRoadPercentage,
         wideRoadPercentage,
         urbanPercentage,
-        ruralPercentage,
       };
 
       const response = await api.post<WhatIfResponse>("/api/public/environment-risk/simulate", payload);
@@ -296,38 +287,11 @@ const PublicWhatIfSimulation: React.FC = () => {
                       className="w-full border border-brand-gray-300 rounded px-2 py-1 text-xs font-bold bg-white"
                     />
                   </div>
-
-                  {/* Curve Count */}
-                  <div className="bg-brand-gray-50 p-2.5 rounded border border-brand-gray-200 space-y-1">
-                    <label className="block text-[11px] font-bold text-gray-600">Curves</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={curveCount}
-                      onChange={(e) => setCurveCount(Math.max(0, parseInt(e.target.value) || 0))}
-                      className="w-full border border-brand-gray-300 rounded px-2 py-1 text-xs font-bold bg-white"
-                    />
-                  </div>
                 </div>
 
                 {/* Road Width Profile Sliders */}
                 <div className="space-y-3 pt-2">
                   <h4 className="text-[11px] font-bold text-gray-600 uppercase">Road Width Profile (%)</h4>
-                  
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-gray-600">
-                      <span>Narrow Road Coverage</span>
-                      <span>{narrowRoadPercentage}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={narrowRoadPercentage}
-                      onChange={(e) => setNarrowRoadPercentage(parseFloat(e.target.value))}
-                      className="w-full accent-brand-blue-800"
-                    />
-                  </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs font-semibold text-gray-600">

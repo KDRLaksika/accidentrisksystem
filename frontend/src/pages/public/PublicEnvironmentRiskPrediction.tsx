@@ -114,7 +114,7 @@ const PublicEnvironmentRiskPrediction: React.FC = () => {
           Accident Environment Risk Prediction
         </h1>
         <p className="text-sm text-gray-700 font-semibold mt-1">
-          Machine Learning accident risk prediction integrating survey environment characteristics (junctions, schools, hospitals, crossings, curves, road width, land use) and time windows with SHAP Explainable AI explanations.
+          Machine Learning accident risk prediction integrating survey environment characteristics (junctions, schools, hospitals, crossings, road width, land use) and time windows with SHAP Explainable AI explanations.
         </p>
       </div>
 

@@ -12,12 +12,9 @@ export interface RoadEnvironmentFeaturesItem {
   bridgeCount: number;
   trafficSignalCount: number;
   pedestrianCrossingCount: number;
-  curveCount: number;
   straightRoadPercentage: number;
-  narrowRoadPercentage: number;
   wideRoadPercentage: number;
   urbanPercentage: number;
-  ruralPercentage: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -195,21 +192,17 @@ const PublicRoadEnvironmentFeatures: React.FC = () => {
                         <span className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold border border-emerald-200">
                           Bridges: {item.bridgeCount}
                         </span>
-                        <span className="bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded font-semibold border border-orange-200">
-                          Curves: {item.curveCount}
-                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-[11px] font-medium">
                       <div className="space-y-0.5">
                         <div>Straight: <span className="font-bold">{item.straightRoadPercentage.toFixed(1)}%</span></div>
-                        <div>Narrow: <span className="font-bold">{item.narrowRoadPercentage.toFixed(1)}%</span> | Wide: <span className="font-bold">{item.wideRoadPercentage.toFixed(1)}%</span></div>
+                        <div>Wide: <span className="font-bold">{item.wideRoadPercentage.toFixed(1)}%</span></div>
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-[11px] font-medium">
                       <div className="space-y-0.5">
                         <div className="text-blue-600 dark:text-blue-400 font-bold">Urban: {item.urbanPercentage.toFixed(1)}%</div>
-                        <div className="text-emerald-600 dark:text-emerald-400 font-bold">Rural: {item.ruralPercentage.toFixed(1)}%</div>
                       </div>
                     </td>
                   </tr>

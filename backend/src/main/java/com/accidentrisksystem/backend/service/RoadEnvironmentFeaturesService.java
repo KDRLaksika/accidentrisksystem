@@ -119,12 +119,9 @@ public class RoadEnvironmentFeaturesService implements IRoadEnvironmentFeaturesS
         if (dto.getBridgeCount() != null) entity.setBridgeCount(dto.getBridgeCount());
         if (dto.getTrafficSignalCount() != null) entity.setTrafficSignalCount(dto.getTrafficSignalCount());
         if (dto.getPedestrianCrossingCount() != null) entity.setPedestrianCrossingCount(dto.getPedestrianCrossingCount());
-        if (dto.getCurveCount() != null) entity.setCurveCount(dto.getCurveCount());
         if (dto.getStraightRoadPercentage() != null) entity.setStraightRoadPercentage(BigDecimal.valueOf(dto.getStraightRoadPercentage()));
-        if (dto.getNarrowRoadPercentage() != null) entity.setNarrowRoadPercentage(BigDecimal.valueOf(dto.getNarrowRoadPercentage()));
         if (dto.getWideRoadPercentage() != null) entity.setWideRoadPercentage(BigDecimal.valueOf(dto.getWideRoadPercentage()));
         if (dto.getUrbanPercentage() != null) entity.setUrbanPercentage(BigDecimal.valueOf(dto.getUrbanPercentage()));
-        if (dto.getRuralPercentage() != null) entity.setRuralPercentage(BigDecimal.valueOf(dto.getRuralPercentage()));
     }
 
     private RoadEnvironmentFeaturesResponseDto mapToResponse(RoadEnvironmentFeatures entity) {
@@ -140,12 +137,9 @@ public class RoadEnvironmentFeaturesService implements IRoadEnvironmentFeaturesS
         dto.setBridgeCount(entity.getBridgeCount());
         dto.setTrafficSignalCount(entity.getTrafficSignalCount());
         dto.setPedestrianCrossingCount(entity.getPedestrianCrossingCount());
-        dto.setCurveCount(entity.getCurveCount());
         if (entity.getStraightRoadPercentage() != null) dto.setStraightRoadPercentage(entity.getStraightRoadPercentage().doubleValue());
-        if (entity.getNarrowRoadPercentage() != null) dto.setNarrowRoadPercentage(entity.getNarrowRoadPercentage().doubleValue());
         if (entity.getWideRoadPercentage() != null) dto.setWideRoadPercentage(entity.getWideRoadPercentage().doubleValue());
         if (entity.getUrbanPercentage() != null) dto.setUrbanPercentage(entity.getUrbanPercentage().doubleValue());
-        if (entity.getRuralPercentage() != null) dto.setRuralPercentage(entity.getRuralPercentage().doubleValue());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
